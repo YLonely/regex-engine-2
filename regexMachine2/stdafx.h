@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include <stdexcept>
 
 
 #include "regex_ast.h"

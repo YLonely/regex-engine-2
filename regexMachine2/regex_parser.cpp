@@ -12,6 +12,11 @@
 	plus::=	elementary-RE "+"
 	ques::=	elementary-RE "?"
 	num-range::= elementary-RE "{" range "}"
+
+	basic-RE::= elementary-RE special-symbol
+	special-symbol::= "{" range "}" | "*" | "+" | "?" | ¦Å
+
+
 	range::= num | num "," | num "," num
 	elementary-RE::= group | any | eos | char | set
 	group::= "(" RE ")"
@@ -30,6 +35,7 @@
 
 static string::size_type index = 0; //the index of regex string.
 static string regex;
+vector<node_ptr> nodes;
 
 /*
 	Helper function
@@ -57,20 +63,8 @@ void regex_parse(string re)
 
 
 
-node_ptr _union()
-{
 
-}
 
-node_ptr basic_re()
-{
-
-}
-
-node_ptr concatenation()
-{
-
-}
 
 node_ptr num_range()
 {
@@ -102,24 +96,65 @@ node_ptr set()
 
 }
 
+node_ptr basic_re()
+{
+
+}
+
+node_ptr _union()
+{
+	if (index == regex.size())
+		return nullptr;
+
+	if (!match("|"))
+		throw runtime_error("There must be a | before union.");
+	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
+
+}
+
+node_ptr concatenation()
+{
+	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
+	left = basic_re();
+	if (left == nullptr)
+		return nullptr;
+	right = concatenation();
+	if (right == nullptr)
+		return left;
+	else
+	{
+		con_node = make_shared<ConcatenationNode>(left, right);
+		nodes.push_back(con_node);
+		return con_node;
+	}
+}
+
 node_ptr simple_re()
 {
-	node_ptr left = nullptr, right = nullptr;
+	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
 	left = basic_re();
 	right = concatenation();
 	if (right == nullptr)
 		return left;
 	else
-		return make_shared<IASTNode>(left, right);
+	{
+		con_node = make_shared<ConcatenationNode>(left, right);
+		nodes.push_back(con_node);
+		return con_node;
+	}
 }
 
 node_ptr regular_expression()
 {
-	node_ptr left = nullptr, right = nullptr;
+	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
 	left = simple_re();
 	right = _union();
 	if (right == nullptr)
 		return left;
 	else
-		return make_shared<IASTNode>(left, right);
+	{
+		union_node = make_shared<AlternationNode>(left, right);
+		nodes.push_back(union_node);
+		return union_node;
+	}
 }

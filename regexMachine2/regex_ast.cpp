@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-vector<IASTNode*> nodes;
+
 
 void CharNode::accept_visitor(IVisitor visitor)
 {
