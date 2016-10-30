@@ -2,6 +2,7 @@
 
 void Visitor::visit(CharNode)
 {
+
 }
 
 void Visitor::visit(RangeNode)
