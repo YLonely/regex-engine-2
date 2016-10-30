@@ -1,8 +1,11 @@
 #pragma once
 #include <utility>
 #include <vector>
+#include <memory>
 using namespace std;
 class IVisitor;
+
+typedef shared_ptr<IASTNode> node_ptr;
 
 class IASTNode
 {
@@ -27,11 +30,11 @@ class RangeNode :public IASTNode
 {
 public:
 	RangeNode() = delete;
-	RangeNode(IASTNode *node, int min, int max) :node(node), min(min), max(max) {}
+	RangeNode(node_ptr node, int min, int max) :node(node), min(min), max(max) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *node;
+	node_ptr node;
 	int min;
 	int max;	//max=-1 means infinity
 };
@@ -40,8 +43,8 @@ class SetNode :public IASTNode
 {
 public:
 	SetNode() = default;
-	void add_set_range(pair<char, char> p);
-	void add_set_range(char ch);
+	void add_set_range(pair<char, char> &p);
+	void add_set_range(char &ch);
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
@@ -52,56 +55,56 @@ class ConcatenationNode :public IASTNode
 {
 public:
 	ConcatenationNode() = delete;
-	ConcatenationNode(IASTNode *left, IASTNode *right) :left(left), right(right) {}
+	ConcatenationNode(node_ptr left, node_ptr right) :left(left), right(right) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *left;
-	IASTNode *right;
+	node_ptr left;
+	node_ptr right;
 };
 
 class AlternationNode :public IASTNode
 {
 public:
 	AlternationNode() = delete;
-	AlternationNode(IASTNode *left, IASTNode *right) :left(left), right(right) {}
+	AlternationNode(node_ptr left, node_ptr right) :left(left), right(right) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *left;
-	IASTNode *right;
+	node_ptr left;
+	node_ptr right;
 };
 
 class StarNode :public IASTNode
 {
 public:
 	StarNode() = delete;
-	StarNode(IASTNode *node) :node(node) {}
+	StarNode(node_ptr node) :node(node) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *node;
+	node_ptr node;
 };
 
 class PlusNode :public IASTNode
 {
 public:
 	PlusNode() = delete;
-	PlusNode(IASTNode *node) :node(node) {}
+	PlusNode(node_ptr node) :node(node) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *node;
+	node_ptr node;
 };
 
 class QuesNode :public IASTNode
 {
 public:
 	QuesNode() = delete;
-	QuesNode(IASTNode *node) :node(node) {}
+	QuesNode(node_ptr node) :node(node) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
-	IASTNode *node;
+	node_ptr node;
 };
 

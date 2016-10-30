@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <vector>
 #include <utility>
+#include <memory>
+
+
 #include "regex_ast.h"
 #include "visitor.h"
 

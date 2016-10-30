@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 /*
 	The parser for regex.Transform the regex into ast.
 
@@ -25,58 +26,100 @@
 	char-range::= char "-" char
 */
 
-IASTNode *regular_expression()
+
+
+static string::size_type index = 0; //the index of regex string.
+static string regex;
+
+/*
+	Helper function
+*/
+bool match(const string &s)
+{
+	string::size_type temp = index;
+	for (auto &c : s)
+	{
+		if (c != regex[index++])
+		{
+			index = temp;
+			return false;
+		}
+	}
+	return true;
+}
+
+void regex_parse(string re)
+{
+	regex = re;
+}
+
+
+
+
+
+node_ptr _union()
 {
 
 }
 
-IASTNode *simple_re()
+node_ptr basic_re()
 {
 
 }
 
-IASTNode *_union()
+node_ptr concatenation()
 {
 
 }
 
-IASTNode *basic_re()
+node_ptr num_range()
 {
 
 }
 
-IASTNode *concatenation()
+node_ptr star()
 {
 
 }
 
-IASTNode *num_range()
+node_ptr plus()
 {
 
 }
 
-IASTNode *star()
+node_ptr ques()
 {
 
 }
 
-IASTNode *plus()
+node_ptr elementary_re()
 {
 
 }
 
-IASTNode *ques()
+node_ptr set()
 {
 
 }
 
-IASTNode *elementary_re()
+node_ptr simple_re()
 {
-
+	node_ptr left = nullptr, right = nullptr;
+	left = basic_re();
+	right = concatenation();
+	if (right == nullptr)
+		return left;
+	else
+		return make_shared<IASTNode>(left, right);
 }
 
-IASTNode *set()
+node_ptr regular_expression()
 {
-
+	node_ptr left = nullptr, right = nullptr;
+	left = simple_re();
+	right = _union();
+	if (right == nullptr)
+		return left;
+	else
+		return make_shared<IASTNode>(left, right);
 }
-
