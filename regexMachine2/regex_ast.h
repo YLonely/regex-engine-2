@@ -19,11 +19,12 @@ class CharNode :public IASTNode
 {
 public:
 	CharNode() = delete;
-	CharNode(char ch) :c(ch) {}
+	CharNode(char ch, bool ismeta) :c(ch), ismeta(ismeta) {}
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
 	char c = -2;
+	bool ismeta = false;
 };
 
 class RangeNode :public IASTNode

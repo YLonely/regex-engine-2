@@ -59,18 +59,6 @@ void regex_parse(string re)
 	regex = re;
 }
 
-
-
-
-
-
-
-
-node_ptr num_range()
-{
-
-}
-
 node_ptr star()
 {
 
@@ -86,19 +74,122 @@ node_ptr ques()
 
 }
 
-node_ptr elementary_re()
-{
-
-}
 
 node_ptr set()
 {
 
 }
 
+node_ptr elementary_re()
+{
+	node_ptr node = nullptr;
+	if (match("("))
+	{
+		if (match(")"))
+			throw runtime_error("Missing argument in '(' ')'");
+		else
+		{
+			node = regular_expression();
+			if (!match(")"))
+				throw runtime_error("Syntax error:missing ')'");
+		}
+	} else if (match("\\"))
+	{
+		switch (regex[index])
+		{
+		case 't':
+		case 'n':
+		case 'r':
+		case 'f':
+		case 'd':
+		case 'D':
+		case 's':
+		case 'S':
+		case 'w':
+		case 'W':
+			node = make_shared<CharNode>(regex[index], true);
+			nodes.push_back(node);
+			break;
+		case '|':
+		case '.':
+		case '*':
+		case '?':
+		case '+':
+		case '[':
+		case ']':
+		case '{':
+		case '}':
+		case '\\':
+		default:
+			node = make_shared<CharNode>(regex[index], false);
+			nodes.push_back(node);
+			break;
+		}
+	}
+}
+
+pair<int, int> range()
+{
+	int num1 = 0, num2 = 0;
+	if (isdigit(regex[index]))
+		num1 = regex[index++] - '0';
+	else
+		throw runtime_error("Missing argument next to the '{'.");
+	while (isdigit(regex[index]))
+	{
+		num1 = num1 * 10 + regex[index] - '0';
+		++index;
+	}
+	if (match("}"))
+		return make_pair(num1, num1);
+	else if (match(","))
+	{
+		if (isdigit(regex[index]))
+			num2 = regex[index++] - '0';
+		else
+			throw runtime_error("Missing argument next to the ','.");
+		while (isdigit(regex[index]))
+		{
+			num2 = num2 * 10 + regex[index] - '0';
+			++index;
+		}
+		if (match("}"))
+			if (num1 == num2)
+				throw runtime_error("In the operation \"{num1,num2}\",num1 is equal to num2.");
+			else
+				return make_pair(num1, num2);
+		else
+			throw runtime_error("Syntax error:missing '}'.");
+	} else
+		throw runtime_error("Syntax error:wrong symbol in the operation \"{num1,num2}\".");
+}
+
+
 node_ptr basic_re()
 {
-
+	node_ptr ele = elementary_re();
+	node_ptr temp = nullptr;
+	if (match("{"))
+	{
+		if (match("}"))
+			throw runtime_error("Missing argument in '{' '}'");
+		pair<int, int> p = range();
+		temp = make_shared<RangeNode>(ele, p.first, p.second);
+		nodes.push_back(temp);
+	} else if (match("*"))
+	{
+		temp = make_shared<StarNode>(ele);
+		nodes.push_back(temp);
+	} else if (match("+"))
+	{
+		temp = make_shared<PlusNode>(ele);
+		nodes.push_back(temp);
+	} else if (match("?"))
+	{
+		temp = make_shared<QuesNode>(ele);
+		nodes.push_back(temp);
+	}
+	return temp;
 }
 
 node_ptr _union()
@@ -107,8 +198,18 @@ node_ptr _union()
 		return nullptr;
 
 	if (!match("|"))
-		throw runtime_error("There must be a | before union.");
+		throw runtime_error("Syntax error:missing '|'");
 	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
+	left = simple_re();
+	right = _union();
+	if (right == nullptr)
+		return left;
+	else
+	{
+		union_node = make_shared<AlternationNode>(left, right);
+		nodes.push_back(union_node);
+		return union_node;
+	}
 
 }
 
