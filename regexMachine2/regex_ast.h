@@ -43,13 +43,15 @@ private:
 class SetNode :public IASTNode
 {
 public:
-	SetNode() = default;
+	SetNode() = delete;
+	SetNode(bool ispositive) :ispositive(ispositive) {}
 	void add_set_range(pair<char, char> &p);
 	void add_set_range(char &ch);
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:
 	vector<pair<char, char>> set;
+	bool ispositive = true;
 };
 
 class ConcatenationNode :public IASTNode
