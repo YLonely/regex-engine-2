@@ -37,45 +37,20 @@ static string::size_type index = 0; //the index of regex string.
 static string regex;
 vector<node_ptr> nodes;
 
+node_ptr regular_expression();
+node_ptr simple_re();
+
+
 /*
 	Helper function
 */
-bool match(const char &c)
-{
-	if (c != regex[index++])
-	{
-		--index;
-		return false;
-	}
-	return true;
-}
+#define match(c) (c==regex[index]?(++index,true):false)
 
-void regex_parse(string re)
+void regex_parse(const string &re)
 {
 	regex = re;
+	regular_expression();
 }
-
-node_ptr star()
-{
-
-}
-
-node_ptr plus()
-{
-
-}
-
-node_ptr ques()
-{
-
-}
-
-
-node_ptr set()
-{
-
-}
-
 
 
 void set_item(shared_ptr<SetNode> &set)
@@ -91,17 +66,18 @@ void set_item(shared_ptr<SetNode> &set)
 			else
 				set->add_set_range(make_pair(c, regex[index++]));
 		} else
+		{
 			set->add_set_range(c);
+			++index;
+		}
 	}
 }
 
 
 
-
-
-node_ptr elementary_re()
+void _char(node_ptr &node)
 {
-	/*auto is_metachar = [](const char &c)->bool {switch (c)
+	auto is_metachar = [](const char &c)->bool {switch (c)
 	{
 	case '|':
 	case '.':
@@ -117,7 +93,19 @@ node_ptr elementary_re()
 	default:
 		break;
 	}
-	return false; };*/
+	return false; };
+
+	if (!is_metachar(regex[index]))
+	{
+		node = make_shared<CharNode>(regex[index++], false);
+		nodes.push_back(node);
+	}
+}
+
+
+node_ptr elementary_re()
+{
+
 
 	/*
 		Special char is:
@@ -177,7 +165,6 @@ node_ptr elementary_re()
 		{
 			set_n = make_shared<SetNode>(false);
 			set_item(set_n);
-
 		} else
 		{
 			set_n = make_shared<SetNode>(true);
@@ -185,11 +172,12 @@ node_ptr elementary_re()
 		}
 		node = set_n;
 		nodes.push_back(node);
-	} else
+	} else if (match('.'))
 	{
-		node = make_shared<CharNode>(regex[index], false);
+		node = make_shared<CharNode>('.', true);
 		nodes.push_back(node);
-	}
+	} else
+		_char(node);
 
 	return node;
 }
@@ -254,7 +242,8 @@ node_ptr basic_re()
 	{
 		temp = make_shared<QuesNode>(ele);
 		nodes.push_back(temp);
-	}
+	} else
+		temp = ele;
 	return temp;
 }
 

@@ -6,6 +6,16 @@
 
 int main()
 {
-    return 0;
+	try
+	{
+
+		regex_parse("ab[d-f_]|x?y{2,5}z*|(mn)+");
+	}
+	catch (const std::exception& e)
+	{
+		cout << e.what() << endl;
+	}
+
+	return 0;
 }
 

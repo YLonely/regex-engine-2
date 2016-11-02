@@ -4,9 +4,6 @@
 #include <memory>
 using namespace std;
 class IVisitor;
-
-typedef shared_ptr<IASTNode> node_ptr;
-
 class IASTNode
 {
 public:
@@ -14,6 +11,8 @@ public:
 	virtual ~IASTNode() = default;
 	virtual void operation() = 0;
 };
+
+typedef shared_ptr<IASTNode> node_ptr;
 
 class CharNode :public IASTNode
 {
@@ -111,3 +110,4 @@ private:
 	node_ptr node;
 };
 
+void regex_parse(const string &re);
