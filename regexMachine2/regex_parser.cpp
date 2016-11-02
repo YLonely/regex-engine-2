@@ -76,9 +76,63 @@ node_ptr set()
 
 }
 
-void metacharacter(node_ptr &node)
+
+
+void set_item(shared_ptr<SetNode> &set)
 {
-	switch (regex[index])
+	char c;
+	while (isalnum(regex[index]) || regex[index] == '_')
+	{
+		c = regex[index];
+		if (match('-'))
+		{
+			if (c >= regex[index])
+				throw runtime_error("Wrong argument in \"[a-b]\"");
+			else
+				set->add_set_range(make_pair(c, regex[index++]));
+		} else
+			set->add_set_range(c);
+	}
+}
+
+
+
+
+
+node_ptr elementary_re()
+{
+	/*auto is_metachar = [](const char &c)->bool {switch (c)
+	{
+	case '|':
+	case '.':
+	case '*':
+	case '?':
+	case '+':
+	case '[':
+	case ']':
+	case '{':
+	case '}':
+	case '\\':
+		return true;
+	default:
+		break;
+	}
+	return false; };*/
+
+	/*
+		Special char is:
+		\t {=tab character}
+		\n {=newline character}
+		\r {=carriage return character}
+		\f {=form feed character}
+		\d {=a digit, [0-9]}
+		\D {=not a digit, [^0-9]}
+		\s {=whitespace, [ \t\n\r\f]}
+		\S {=not a whitespace, [^ \t\n\r\f]}
+		\w {='word' character, [a-zA-Z0-9_]}
+		\W {=not a 'word' character, [^a-zA-Z0-9_]}
+	*/
+	auto is_specialchar = [](const char &c)->bool {switch (c)
 	{
 	case 't':
 	case 'n':
@@ -90,29 +144,15 @@ void metacharacter(node_ptr &node)
 	case 'S':
 	case 'w':
 	case 'W':
-		node = make_shared<CharNode>(regex[index], true);
-		nodes.push_back(node);
-		break;
-	case '|':
-	case '.':
-	case '*':
-	case '?':
-	case '+':
-	case '[':
-	case ']':
-	case '{':
-	case '}':
-	case '\\':
+		return true;
 	default:
-		node = make_shared<CharNode>(regex[index], false);
-		nodes.push_back(node);
 		break;
 	}
-}
+	return false;
+	};
 
-node_ptr elementary_re()
-{
 	node_ptr node = nullptr;
+
 	if (match('('))
 	{
 		if (match(')'))
@@ -125,30 +165,33 @@ node_ptr elementary_re()
 		}
 	} else if (match('\\'))
 	{
-		metacharacter(node);
+		if (is_specialchar(regex[index]))
+			node = make_shared<CharNode>(regex[index], true);
+		else
+			node = make_shared<CharNode>(regex[index], false);
+		nodes.push_back(node);
 	} else if (match('['))
 	{
-		char c;
+		shared_ptr<SetNode> set_n;
 		if (match('^'))
 		{
-			shared_ptr<SetNode> set_n(false);
-			while (isalnum(regex[index]) || regex[index] == '_')
-			{
-				c = regex[index];
-				if (match('-'))
-				{
-					if (c >= regex[index])
-						throw runtime_error("Wrong argument in \"[a-b]\"");
-					else
-						set_n->add_set_range(make_pair(c, regex[index++]));
-				} else
-					set_n->add_set_range(c);
-			}
+			set_n = make_shared<SetNode>(false);
+			set_item(set_n);
+
 		} else
 		{
-
+			set_n = make_shared<SetNode>(true);
+			set_item(set_n);
 		}
+		node = set_n;
+		nodes.push_back(node);
+	} else
+	{
+		node = make_shared<CharNode>(regex[index], false);
+		nodes.push_back(node);
 	}
+
+	return node;
 }
 
 pair<int, int> range()
