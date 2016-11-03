@@ -46,6 +46,7 @@ public:
 	SetNode(bool ispositive) :ispositive(ispositive) {}
 	void add_set_range(pair<char, char> &p);
 	void add_set_range(char &ch);
+	void merge();
 	void accept_visitor(IVisitor visitor) override;
 	void operation() override;
 private:

@@ -15,6 +15,7 @@
 #include <memory>
 #include <stdexcept>
 #include <cctype>
+#include <stdlib.h>
 
 #include "regex_ast.h"
 #include "visitor.h"

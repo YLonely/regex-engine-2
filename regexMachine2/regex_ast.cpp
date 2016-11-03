@@ -20,33 +20,22 @@ void RangeNode::operation()
 
 void SetNode::add_set_range(pair<char, char> &p)
 {
-	if (set.size() == 0)
-	{
-		set.push_back(p);
-		return;
-	}
-	for (auto it = set.begin(); it != set.end();)
-	{
-		if (it->first > p.first&&it->second < p.second)
-		{
-			set.erase(it);
-			set.push_back(make_pair(p.first, p.second));
-		} else if (p.first < it->first&&p.second >= it->first)
-		{
-			set.push_back(make_pair(p.first, it->second));
-			set.erase(it);
-		} else if (it->second >= p.first&&it->second < p.second)
-		{
-			set.push_back(make_pair(it->first, p.second));
-			set.erase(it);
-		} else
-			++it;
-	}
+	set.push_back(p);
 }
 
 void SetNode::add_set_range(char & ch)
 {
-	add_set_range(make_pair(ch, ch));
+	set.push_back(make_pair(ch, ch));
+}
+
+void SetNode::merge()
+{
+	if (set.size() == 1)
+		return;
+	sort(set.begin(), set.end(), [](const pair<char, char> &p1, const pair<char, char> &p2) {
+		return p1.first < p2.first;
+	});
+
 }
 
 void SetNode::accept_visitor(IVisitor visitor)

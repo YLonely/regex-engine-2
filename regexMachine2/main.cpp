@@ -9,13 +9,14 @@ int main()
 	try
 	{
 
-		regex_parse("ab[d-f_]|x?y{2,5}z*|(mn)+");
+		regex_parse("((abc[d-f]|g)))");
 	}
 	catch (const std::exception& e)
 	{
 		cout << e.what() << endl;
 	}
 
+	system("pause");
 	return 0;
 }
 

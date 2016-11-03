@@ -44,7 +44,16 @@ node_ptr simple_re();
 /*
 	Helper function
 */
-#define match(c) (c==regex[index]?(++index,true):false)
+bool match(const char &c)
+{
+	if (index < regex.size() && c == regex[index])
+	{
+		++index;
+		return true;
+	}
+	return false;
+}
+
 
 void regex_parse(const string &re)
 {
@@ -58,7 +67,7 @@ void set_item(shared_ptr<SetNode> &set)
 	char c;
 	while (isalnum(regex[index]) || regex[index] == '_')
 	{
-		c = regex[index];
+		c = regex[index++];
 		if (match('-'))
 		{
 			if (c >= regex[index])
@@ -68,7 +77,6 @@ void set_item(shared_ptr<SetNode> &set)
 		} else
 		{
 			set->add_set_range(c);
-			++index;
 		}
 	}
 }
@@ -77,6 +85,9 @@ void set_item(shared_ptr<SetNode> &set)
 
 void _char(node_ptr &node)
 {
+	if (index >= regex.size())
+		return;
+
 	auto is_metachar = [](const char &c)->bool {switch (c)
 	{
 	case '|':
@@ -89,6 +100,8 @@ void _char(node_ptr &node)
 	case '{':
 	case '}':
 	case '\\':
+	case '(':
+	case ')':
 		return true;
 	default:
 		break;
@@ -154,12 +167,14 @@ node_ptr elementary_re()
 	} else if (match('\\'))
 	{
 		if (is_specialchar(regex[index]))
-			node = make_shared<CharNode>(regex[index], true);
+			node = make_shared<CharNode>(regex[index++], true);
 		else
-			node = make_shared<CharNode>(regex[index], false);
+			node = make_shared<CharNode>(regex[index++], false);
 		nodes.push_back(node);
 	} else if (match('['))
 	{
+		if (match(']'))
+			throw runtime_error("Missing argument in '[' ']'");
 		shared_ptr<SetNode> set_n;
 		if (match('^'))
 		{
@@ -170,7 +185,10 @@ node_ptr elementary_re()
 			set_n = make_shared<SetNode>(true);
 			set_item(set_n);
 		}
+		if (!match(']'))
+			throw runtime_error("Syntax error:missing ']'");
 		node = set_n;
+		set_n->merge();
 		nodes.push_back(node);
 	} else if (match('.'))
 	{
@@ -208,8 +226,8 @@ pair<int, int> range()
 			++index;
 		}
 		if (match('}'))
-			if (num1 == num2)
-				throw runtime_error("In the operation \"{num1,num2}\",num1 is equal to num2.");
+			if (num1 >= num2)
+				throw runtime_error("In the operation \"{num1,num2}\",num1 must be smaller than num2.");
 			else
 				return make_pair(num1, num2);
 		else
@@ -249,11 +267,10 @@ node_ptr basic_re()
 
 node_ptr _union()
 {
-	if (index == regex.size())
-		return nullptr;
-
+	/*if (index == regex.size())
+		return nullptr;*/
 	if (!match('|'))
-		throw runtime_error("Syntax error:missing '|'");
+		return nullptr;
 	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
 	left = simple_re();
 	right = _union();
@@ -270,6 +287,7 @@ node_ptr _union()
 
 node_ptr concatenation()
 {
+
 	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
 	left = basic_re();
 	if (left == nullptr)
