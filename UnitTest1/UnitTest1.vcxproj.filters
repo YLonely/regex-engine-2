@@ -15,22 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="regex_ast.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="visitor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="regex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,16 +26,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="regex_ast.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="visitor.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="regex_parser.cpp">
+    <ClCompile Include="unittest1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -33,8 +33,8 @@
 
 
 
-static string::size_type index = 0; //the index of regex string.
-static string regex;
+static wstring::size_type index = 0; //the index of regex string.
+static wstring regex;
 vector<node_ptr> nodes;
 
 node_ptr regular_expression();
@@ -44,7 +44,7 @@ node_ptr simple_re();
 /*
 	Helper function
 */
-bool match(const char &c)
+bool match(const wchar_t &c)
 {
 	if (index < regex.size() && c == regex[index])
 	{
@@ -55,7 +55,7 @@ bool match(const char &c)
 }
 
 
-void regex_parse(const string &re)
+void regex_parse(const wstring &re)
 {
 	regex = re;
 	regular_expression();
@@ -64,7 +64,7 @@ void regex_parse(const string &re)
 
 void set_item(shared_ptr<SetNode> &set)
 {
-	char c;
+	wchar_t c;
 	while (isalnum(regex[index]) || regex[index] == '_')
 	{
 		c = regex[index++];
@@ -88,7 +88,7 @@ void _char(node_ptr &node)
 	if (index >= regex.size())
 		return;
 
-	auto is_metachar = [](const char &c)->bool {switch (c)
+	auto is_metachar = [](const wchar_t &c)->bool {switch (c)
 	{
 	case '|':
 	case '.':
@@ -128,12 +128,12 @@ node_ptr elementary_re()
 		\f {=form feed character}
 		\d {=a digit, [0-9]}
 		\D {=not a digit, [^0-9]}
-		\s {=whitespace, [ \t\n\r\f]}
+		\s {=whitespace, [\t\n\r\f]}
 		\S {=not a whitespace, [^ \t\n\r\f]}
 		\w {='word' character, [a-zA-Z0-9_]}
 		\W {=not a 'word' character, [^a-zA-Z0-9_]}
 	*/
-	auto is_specialchar = [](const char &c)->bool {switch (c)
+	auto is_specialchar = [](const wchar_t &c)->bool {switch (c)
 	{
 	case 't':
 	case 'n':

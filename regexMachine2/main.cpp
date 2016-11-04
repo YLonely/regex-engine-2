@@ -3,19 +3,16 @@
 
 #include "stdafx.h"
 
-
 int main()
 {
 	try
 	{
-
-		regex_parse("[ba-ecb-gf-z]");
+		regex_parse(L"ÄãºÃ");
 	}
 	catch (const std::exception& e)
 	{
 		cout << e.what() << endl;
 	}
-
 	system("pause");
 	return 0;
 }

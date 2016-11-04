@@ -4,26 +4,19 @@
 
 void CharNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void CharNode::operation()
-{
+	visitor.visit(*this);
 }
 
 void RangeNode::accept_visitor(IVisitor visitor)
 {
 }
 
-void RangeNode::operation()
-{
-}
-
-void SetNode::add_set_range(pair<char, char> &p)
+void SetNode::add_set_range(pair<wchar_t, wchar_t> &p)
 {
 	set.push_back(p);
 }
 
-void SetNode::add_set_range(char & ch)
+void SetNode::add_set_range(wchar_t & ch)
 {
 	set.push_back(make_pair(ch, ch));
 }
@@ -32,11 +25,11 @@ void SetNode::merge()
 {
 	if (set.size() == 1)
 		return;
-	sort(set.begin(), set.end(), [](const pair<char, char> &p1, const pair<char, char> &p2) {
+	sort(set.begin(), set.end(), [](const pair<wchar_t, wchar_t> &p1, const pair<wchar_t, wchar_t> &p2) {
 		return p1.first < p2.first;
 	});
 	int count = 1;
-	char temp1, temp2;
+	wchar_t temp1, temp2;
 	for (auto it1 = set.begin(), it2 = set.begin() + 1;;)
 	{
 		if (it2 != set.end() && (it2 - 1)->second + 1 >= it2->first)
@@ -67,49 +60,30 @@ void SetNode::merge()
 
 void SetNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void SetNode::operation()
-{
-
+	visitor.visit(*this);
 }
 
 void ConcatenationNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void ConcatenationNode::operation()
-{
+	visitor.visit(*this);
 }
 
 void AlternationNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void AlternationNode::operation()
-{
+	visitor.visit(*this);
 }
 
 void StarNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void StarNode::operation()
-{
+	visitor.visit(*this);
 }
 
 void PlusNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void PlusNode::operation()
-{
+	visitor.visit(*this);
 }
 
 void QuesNode::accept_visitor(IVisitor visitor)
 {
-}
-
-void QuesNode::operation()
-{
+	visitor.visit(*this);
 }
