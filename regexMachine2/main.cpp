@@ -9,7 +9,7 @@ int main()
 	try
 	{
 
-		regex_parse("((abc[d-f]|g)))");
+		regex_parse("[ba-ecb-gf-z]");
 	}
 	catch (const std::exception& e)
 	{
