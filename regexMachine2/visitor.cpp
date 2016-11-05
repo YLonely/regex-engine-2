@@ -1,35 +1,27 @@
 #include "stdafx.h"
 
-void Visitor::visit(CharNode)
+void EdgeSetConstructorVisitor::visit(CharNode)
 {
 
 }
 
-void Visitor::visit(RangeNode)
+void EdgeSetConstructorVisitor::visit(RangeNode)
 {
 }
 
-void Visitor::visit(SetNode)
+void EdgeSetConstructorVisitor::visit(SetNode)
 {
 }
 
-void Visitor::visit(ConcatenationNode)
+
+void EdgeSetConstructorVisitor::visit(StarNode)
 {
 }
 
-void Visitor::visit(AlternationNode)
+void EdgeSetConstructorVisitor::visit(PlusNode)
 {
 }
 
-void Visitor::visit(StarNode)
-{
-
-}
-
-void Visitor::visit(PlusNode)
-{
-}
-
-void Visitor::visit(QuesNode)
+void EdgeSetConstructorVisitor::visit(QuesNode)
 {
 }

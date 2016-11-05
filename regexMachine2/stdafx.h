@@ -17,6 +17,10 @@
 #include <cctype>
 #include <stdlib.h>
 
+
+
+
+#include "regex.h"
 #include "regex_ast.h"
 #include "visitor.h"
 

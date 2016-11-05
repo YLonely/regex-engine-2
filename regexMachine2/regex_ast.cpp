@@ -9,6 +9,7 @@ void CharNode::accept_visitor(IVisitor visitor)
 
 void RangeNode::accept_visitor(IVisitor visitor)
 {
+	visitor.visit(*this);
 }
 
 void SetNode::add_set_range(pair<wchar_t, wchar_t> &p)

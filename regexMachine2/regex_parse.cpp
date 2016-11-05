@@ -35,7 +35,7 @@
 
 static wstring::size_type index = 0; //the index of regex string.
 static wstring regex;
-vector<node_ptr> nodes;
+static vector<node_ptr> *nodes;
 
 node_ptr regular_expression();
 node_ptr simple_re();
@@ -44,7 +44,7 @@ node_ptr simple_re();
 /*
 	Helper function
 */
-bool match(const wchar_t &c)
+static bool match(const wchar_t &c)
 {
 	if (index < regex.size() && c == regex[index])
 	{
@@ -55,14 +55,16 @@ bool match(const wchar_t &c)
 }
 
 
-void regex_parse(const wstring &re)
+vector<node_ptr> *regex_parse(wstring re)
 {
-	regex = re;
+	regex = std::move(re);
+	nodes = new vector<node_ptr>();
 	regular_expression();
+	return nodes;
 }
 
 
-void set_item(shared_ptr<SetNode> &set)
+static void set_item(shared_ptr<SetNode> &set)
 {
 	wchar_t c;
 	while (isalnum(regex[index]) || regex[index] == '_')
@@ -83,7 +85,7 @@ void set_item(shared_ptr<SetNode> &set)
 
 
 
-void _char(node_ptr &node)
+static void _char(node_ptr &node)
 {
 	if (index >= regex.size())
 		return;
@@ -111,12 +113,12 @@ void _char(node_ptr &node)
 	if (!is_metachar(regex[index]))
 	{
 		node = make_shared<CharNode>(regex[index++], false);
-		nodes.push_back(node);
+		nodes->push_back(node);
 	}
 }
 
 
-node_ptr elementary_re()
+static node_ptr elementary_re()
 {
 
 
@@ -170,7 +172,7 @@ node_ptr elementary_re()
 			node = make_shared<CharNode>(regex[index++], true);
 		else
 			node = make_shared<CharNode>(regex[index++], false);
-		nodes.push_back(node);
+		nodes->push_back(node);
 	} else if (match('['))
 	{
 		if (match(']'))
@@ -189,18 +191,18 @@ node_ptr elementary_re()
 			throw runtime_error("Syntax error:missing ']'");
 		node = set_n;
 		set_n->merge();
-		nodes.push_back(node);
+		nodes->push_back(node);
 	} else if (match('.'))
 	{
 		node = make_shared<CharNode>('.', true);
-		nodes.push_back(node);
+		nodes->push_back(node);
 	} else
 		_char(node);
 
 	return node;
 }
 
-pair<int, int> range()
+static pair<int, int> range()
 {
 	int num1 = 0, num2 = 0;
 	if (isdigit(regex[index]))
@@ -237,7 +239,7 @@ pair<int, int> range()
 }
 
 
-node_ptr basic_re()
+static node_ptr basic_re()
 {
 	node_ptr ele = elementary_re();
 	node_ptr temp = nullptr;
@@ -247,25 +249,25 @@ node_ptr basic_re()
 			throw runtime_error("Missing argument in '{' '}'");
 		pair<int, int> p = range();
 		temp = make_shared<RangeNode>(ele, p.first, p.second);
-		nodes.push_back(temp);
+		nodes->push_back(temp);
 	} else if (match('*'))
 	{
 		temp = make_shared<StarNode>(ele);
-		nodes.push_back(temp);
+		nodes->push_back(temp);
 	} else if (match('+'))
 	{
 		temp = make_shared<PlusNode>(ele);
-		nodes.push_back(temp);
+		nodes->push_back(temp);
 	} else if (match('?'))
 	{
 		temp = make_shared<QuesNode>(ele);
-		nodes.push_back(temp);
+		nodes->push_back(temp);
 	} else
 		temp = ele;
 	return temp;
 }
 
-node_ptr _union()
+static node_ptr _union()
 {
 	/*if (index == regex.size())
 		return nullptr;*/
@@ -279,13 +281,13 @@ node_ptr _union()
 	else
 	{
 		union_node = make_shared<AlternationNode>(left, right);
-		nodes.push_back(union_node);
+		nodes->push_back(union_node);
 		return union_node;
 	}
 
 }
 
-node_ptr concatenation()
+static node_ptr concatenation()
 {
 
 	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
@@ -298,12 +300,12 @@ node_ptr concatenation()
 	else
 	{
 		con_node = make_shared<ConcatenationNode>(left, right);
-		nodes.push_back(con_node);
+		nodes->push_back(con_node);
 		return con_node;
 	}
 }
 
-node_ptr simple_re()
+static node_ptr simple_re()
 {
 	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
 	left = basic_re();
@@ -313,12 +315,12 @@ node_ptr simple_re()
 	else
 	{
 		con_node = make_shared<ConcatenationNode>(left, right);
-		nodes.push_back(con_node);
+		nodes->push_back(con_node);
 		return con_node;
 	}
 }
 
-node_ptr regular_expression()
+static node_ptr regular_expression()
 {
 	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
 	left = simple_re();
@@ -328,7 +330,7 @@ node_ptr regular_expression()
 	else
 	{
 		union_node = make_shared<AlternationNode>(left, right);
-		nodes.push_back(union_node);
+		nodes->push_back(union_node);
 		return union_node;
 	}
 }

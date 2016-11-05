@@ -3,16 +3,11 @@
 
 #include "stdafx.h"
 
+
 int main()
 {
-	try
-	{
-		regex_parse(L"ÄãºÃ");
-	}
-	catch (const std::exception& e)
-	{
-		cout << e.what() << endl;
-	}
+	Regex a(L"ssss");
+	a.match(L"sss");
 	system("pause");
 	return 0;
 }
