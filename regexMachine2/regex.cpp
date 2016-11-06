@@ -9,9 +9,19 @@ void parse(wstring regex)
 }
 
 
+Regex::Regex(wstring re)
+{
+	set_regex(std::move(re));
+}
+
+void Regex::set_regex(wstring re)
+{
+	regex = std::move(re);
+	parse(regex);
+}
+
 bool Regex::match(wstring teststring)
 {
-	parse(teststring);
 	return false;
 }
 

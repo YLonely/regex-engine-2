@@ -17,11 +17,10 @@ class CharNode :public IASTNode
 {
 public:
 	CharNode() = delete;
-	CharNode(wchar_t ch, bool is_functionalchar) :c(ch), is_functionalchar(is_functionalchar) {}
+	CharNode(wchar_t ch) :c(ch) {}
 	void accept_visitor(IVisitor visitor) override;
 private:
 	wchar_t c = -2;
-	bool is_functionalchar = false;
 };
 
 class RangeNode :public IASTNode
@@ -41,8 +40,8 @@ class SetNode :public IASTNode
 public:
 	SetNode() = delete;
 	SetNode(bool ispositive) :ispositive(ispositive) {}
-	void add_set_range(pair<wchar_t, wchar_t> &p);
-	void add_set_range(wchar_t &ch);
+	SetNode &add_set_range(const wchar_t &,const wchar_t &);
+	SetNode &add_set_range(const wchar_t &);
 	void merge();
 	void accept_visitor(IVisitor visitor) override;
 private:

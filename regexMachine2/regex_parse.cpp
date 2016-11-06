@@ -33,7 +33,7 @@
 
 
 
-static wstring::size_type index = 0; //the index of regex string.
+static wstring::size_type index; //the index of regex string.
 static wstring regex;
 static vector<node_ptr> *nodes;
 
@@ -59,6 +59,7 @@ vector<node_ptr> *regex_parse(wstring re)
 {
 	regex = std::move(re);
 	nodes = new vector<node_ptr>();
+	index = 0;
 	regular_expression();
 	return nodes;
 }
@@ -75,7 +76,7 @@ static void set_item(shared_ptr<SetNode> &set)
 			if (c >= regex[index])
 				throw runtime_error("Wrong argument in \"[a-b]\"");
 			else
-				set->add_set_range(make_pair(c, regex[index++]));
+				set->add_set_range(c, regex[index++]);
 		} else
 		{
 			set->add_set_range(c);
@@ -112,8 +113,50 @@ static void _char(node_ptr &node)
 
 	if (!is_metachar(regex[index]))
 	{
-		node = make_shared<CharNode>(regex[index++], false);
+		node = make_shared<CharNode>(regex[index++]);
 		nodes->push_back(node);
+	}
+}
+
+
+void special_char(node_ptr &node)
+{
+	shared_ptr<SetNode> set;
+	wchar_t ch = regex[index];
+	switch (ch)
+	{
+	case 't':
+		node = make_shared<CharNode>('\t');
+		break;
+	case 'n':
+		node = make_shared<CharNode>('\n');
+		break;
+	case 'r':
+		node = make_shared<CharNode>('\r');
+		break;
+	case 'f':
+		node = make_shared<CharNode>('\f');
+		break;
+	case 'd':
+	case 'D':
+		set = ch == 'd' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
+		set->add_set_range(L'0', L'9');
+		node = set;
+		break;
+	case 's':
+	case 'S':
+		set = ch == 's' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
+		set->add_set_range(L'\t').add_set_range(L'\n').add_set_range(L'\r').add_set_range(L'\f');
+		node = set;
+		break;
+	case 'w':
+	case 'W':
+		set = ch == 'w' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
+		set->add_set_range(L'a', L'z').add_set_range(L'A', L'Z').add_set_range(L'0', L'9').add_set_range(L'_');
+		node = set;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -131,7 +174,7 @@ static node_ptr elementary_re()
 		\d {=a digit, [0-9]}
 		\D {=not a digit, [^0-9]}
 		\s {=whitespace, [\t\n\r\f]}
-		\S {=not a whitespace, [^ \t\n\r\f]}
+		\S {=not a whitespace, [^\t\n\r\f]}
 		\w {='word' character, [a-zA-Z0-9_]}
 		\W {=not a 'word' character, [^a-zA-Z0-9_]}
 	*/
@@ -169,9 +212,12 @@ static node_ptr elementary_re()
 	} else if (match('\\'))
 	{
 		if (is_specialchar(regex[index]))
-			node = make_shared<CharNode>(regex[index++], true);
+		{
+			special_char(node);
+			++index;
+		}
 		else
-			node = make_shared<CharNode>(regex[index++], false);
+			node = make_shared<CharNode>(regex[index++]);
 		nodes->push_back(node);
 	} else if (match('['))
 	{
@@ -194,7 +240,7 @@ static node_ptr elementary_re()
 		nodes->push_back(node);
 	} else if (match('.'))
 	{
-		node = make_shared<CharNode>('.', true);
+		node = make_shared<CharNode>('.');
 		nodes->push_back(node);
 	} else
 		_char(node);
