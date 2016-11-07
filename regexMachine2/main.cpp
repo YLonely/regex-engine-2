@@ -8,7 +8,15 @@ int main()
 {
 	//Regex a(L"[^a]");
 	//Regex b(L"[^a-m]");
-	Regex c(L"[^a-cg-jm-z]");
+	try
+	{
+		Regex c(L"[\\S-d]");
+
+	}
+	catch (const std::exception& e)
+	{
+		cout << e.what() << endl;
+	}
 	system("pause");
 	return 0;
 }

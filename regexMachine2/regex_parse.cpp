@@ -54,44 +54,9 @@ static bool match(const wchar_t &c)
 	return false;
 }
 
-
-vector<node_ptr> *regex_parse(wstring re)
+static bool is_metachar(const wchar_t &c)
 {
-	regex = std::move(re);
-	nodes = new vector<node_ptr>();
-	index = 0;
-	regular_expression();
-	return nodes;
-}
-
-
-static void set_item(shared_ptr<SetNode> &set)
-{
-	wchar_t c;
-	while (isalnum(regex[index]) || regex[index] == '_')
-	{
-		c = regex[index++];
-		if (match('-'))
-		{
-			if (c >= regex[index])
-				throw runtime_error("Wrong argument in \"[a-b]\"");
-			else
-				set->add_set_range(c, regex[index++]);
-		} else
-		{
-			set->add_set_range(c);
-		}
-	}
-}
-
-
-
-static void _char(node_ptr &node)
-{
-	if (index >= regex.size())
-		return;
-
-	auto is_metachar = [](const wchar_t &c)->bool {switch (c)
+	switch (c)
 	{
 	case '|':
 	case '.':
@@ -109,7 +74,123 @@ static void _char(node_ptr &node)
 	default:
 		break;
 	}
-	return false; };
+	return false;
+};
+
+
+vector<node_ptr> *regex_parse(wstring re)
+{
+	regex = std::move(re);
+	nodes = new vector<node_ptr>();
+	index = 0;
+	regular_expression();
+	return nodes;
+}
+
+
+static void set_item(shared_ptr<SetNode> &set)
+{
+	wchar_t c1, c2;
+	bool setchar = false;
+	while (!is_metachar(regex[index]) || regex[index] == '\\')
+	{
+		if (regex[index] == '\\')
+		{
+			++index;
+			switch (regex[index])
+			{
+			case 't':
+				c1 = '\t';
+				break;
+			case 'n':
+				c1 = '\n';
+				break;
+			case 'r':
+				c1 = '\r';
+				break;
+			case 'f':
+				c1 = '\f';
+				break;
+			case 'd':
+				set->add_set_range(L'0', L'9');
+				setchar = true;
+				break;
+			case 'D':
+				set->add_set_range((wchar_t)0, '0' - 1).add_set_range('9' + 1, (wchar_t)65535);
+				setchar = true;
+				break;
+			case 's':
+				set->add_set_range(L'\t').add_set_range(L'\n').add_set_range(L'\r').add_set_range(L'\f');
+				setchar = true;
+				break;
+			case 'S':
+				set->add_set_range((wchar_t)0, (wchar_t)8).add_set_range((wchar_t)11).add_set_range((wchar_t)14, (wchar_t)65535);
+				setchar = true;
+				break;
+			case 'w':
+				set->add_set_range(L'a', L'z').add_set_range(L'A', L'Z').add_set_range(L'0', L'9').add_set_range(L'_');
+				setchar = true;
+				break;
+			case 'W':
+				set->add_set_range((wchar_t)0, '0' - 1).add_set_range('9' + 1, 'A' - 1).add_set_range('Z' + 1, (wchar_t)94).add_set_range((wchar_t)96).add_set_range((wchar_t)123, (wchar_t)65535);
+				setchar = true;
+				break;
+			default:
+				c1 = regex[index];
+				break;
+			}
+		} else
+			c1 = regex[index];
+		++index;
+		if (match('-'))
+		{
+			if (setchar)
+				throw runtime_error("Wrong argument in \"[a-b]\"");
+			if (regex[index] == '\\')
+			{
+				c2 = regex[++index];
+				if (c2 == 'd' || c2 == 'D' || c2 == 's' || c2 == 'S' || c2 == 'w' || c2 == 'W')
+					throw runtime_error("Wrong argument in \"[a-b]\"");
+				switch (c2)
+				{
+				case 't':
+					c2 = '\t';
+					break;
+				case 'n':
+					c2 = '\n';
+					break;
+				case 'r':
+					c2 = '\r';
+					break;
+				case 'f':
+					c2 = '\f';
+					break;
+				default:
+					break;
+				}
+			} else
+				c2 = regex[index];
+			if (c1 >= c2)
+				throw runtime_error("Wrong argument in \"[a-b]\"");
+			else
+				set->add_set_range(c1, c2);
+			++index;
+		} else if(!setchar)
+		{
+			set->add_set_range(c1);
+			setchar = false;
+		}
+	}
+}
+
+
+
+static void _char(node_ptr &node)
+{
+	if (index >= regex.size())
+		return;
+
+
 
 	if (!is_metachar(regex[index]))
 	{
@@ -119,7 +200,7 @@ static void _char(node_ptr &node)
 }
 
 
-void special_char(node_ptr &node)
+static void functional_char(node_ptr &node)
 {
 	shared_ptr<SetNode> set;
 	wchar_t ch = regex[index];
@@ -178,7 +259,7 @@ static node_ptr elementary_re()
 		\w {='word' character, [a-zA-Z0-9_]}
 		\W {=not a 'word' character, [^a-zA-Z0-9_]}
 	*/
-	auto is_specialchar = [](const wchar_t &c)->bool {switch (c)
+	auto is_functionalchar = [](const wchar_t &c)->bool {switch (c)
 	{
 	case 't':
 	case 'n':
@@ -211,12 +292,11 @@ static node_ptr elementary_re()
 		}
 	} else if (match('\\'))
 	{
-		if (is_specialchar(regex[index]))
+		if (is_functionalchar(regex[index]))
 		{
-			special_char(node);
+			functional_char(node);
 			++index;
-		}
-		else
+		} else
 			node = make_shared<CharNode>(regex[index++]);
 		nodes->push_back(node);
 	} else if (match('['))
