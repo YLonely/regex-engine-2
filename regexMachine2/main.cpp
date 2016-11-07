@@ -15,7 +15,7 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		cout << e.what() << endl;
+		std::cout << e.what() << std::endl;
 	}
 	system("pause");
 	return 0;

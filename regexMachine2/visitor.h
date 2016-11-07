@@ -17,14 +17,14 @@ public:
 class EdgeSetConstructorVisitor :public IVisitor
 {
 public:
-	 void visit(CharNode) override;
-	 void visit(RangeNode) override;
-	 void visit(SetNode) override;
-	 /*void visit(ConcatenationNode) override;
-	 void visit(AlternationNode) override;*/
-	 void visit(StarNode) override;
-	 void visit(PlusNode) override;
-	 void visit(QuesNode) override;
+	void visit(CharNode) override;
+	void visit(RangeNode) override;
+	void visit(SetNode) override;
+	/*void visit(ConcatenationNode) override;
+	void visit(AlternationNode) override;*/
+	void visit(StarNode) override;
+	void visit(PlusNode) override;
+	void visit(QuesNode) override;
 private:
-	vector<pair<wchar_t, wchar_t>> edge_set;
+	std::vector<std::pair<wchar_t, wchar_t>> edge_set;
 };

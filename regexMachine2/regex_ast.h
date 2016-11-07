@@ -2,7 +2,6 @@
 #include <utility>
 #include <vector>
 #include <memory>
-using namespace std;
 class IVisitor;
 class IASTNode
 {
@@ -11,7 +10,7 @@ public:
 	virtual ~IASTNode() = default;
 };
 
-typedef shared_ptr<IASTNode> node_ptr;
+typedef std::shared_ptr<IASTNode> node_ptr;
 
 class CharNode :public IASTNode
 {
@@ -40,12 +39,12 @@ class SetNode :public IASTNode
 public:
 	SetNode() = delete;
 	SetNode(bool ispositive) :ispositive(ispositive) {}
-	SetNode &add_set_range(const wchar_t &,const wchar_t &);
+	SetNode &add_set_range(const wchar_t &, const wchar_t &);
 	SetNode &add_set_range(const wchar_t &);
 	void merge();
 	void accept_visitor(IVisitor visitor) override;
 private:
-	vector<pair<wchar_t, wchar_t>> set;
+	std::vector<std::pair<wchar_t, wchar_t>> set;
 	bool ispositive = true;
 };
 

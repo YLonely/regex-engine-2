@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
-
+using std::pair;
+using std::vector;
+using std::make_pair;
 
 void CharNode::accept_visitor(IVisitor visitor)
 {
@@ -24,6 +25,11 @@ SetNode &SetNode::add_set_range(const wchar_t &ch)
 	return *this;
 }
 
+
+/*
+	This function will 1.merge the duplicate characters in the SetNode.	i.e [aba-d] will be transfered into [a-d].
+	2.reverse the negetive set to positive character range.
+*/
 void SetNode::merge()
 {
 	if (set.size() != 1)

@@ -16,7 +16,6 @@
 	basic-RE::= elementary-RE special-symbol
 	special-symbol::= "{" range "}" | "*" | "+" | "?" | ¦Å
 
-
 	range::= num | num "," | num "," num
 	elementary-RE::= group | any | eos | char | set
 	group::= "(" RE ")"
@@ -31,7 +30,14 @@
 	char-range::= char "-" char
 */
 
+using std::pair;
+using std::vector;
+using std::wstring;
+using std::shared_ptr;
+using std::runtime_error;
 
+using std::make_shared;
+using std::make_pair;
 
 static wstring::size_type index; //the index of regex string.
 static wstring regex;
