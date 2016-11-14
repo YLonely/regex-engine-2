@@ -126,7 +126,8 @@ void set_item(shared_ptr<SetNode> &set)
 				setchar = true;
 				break;
 			case 'S':
-				set->add_set_range((wchar_t)0, (wchar_t)8).add_set_range((wchar_t)11).add_set_range((wchar_t)14, (wchar_t)65535);
+				set->add_set_range((wchar_t)0, (wchar_t)8).add_set_range((wchar_t)11)
+					.add_set_range((wchar_t)14, (wchar_t)65535);
 				setchar = true;
 				break;
 			case 'w':
@@ -134,7 +135,9 @@ void set_item(shared_ptr<SetNode> &set)
 				setchar = true;
 				break;
 			case 'W':
-				set->add_set_range((wchar_t)0, '0' - 1).add_set_range('9' + 1, 'A' - 1).add_set_range('Z' + 1, (wchar_t)94).add_set_range((wchar_t)96).add_set_range((wchar_t)123, (wchar_t)65535);
+				set->add_set_range((wchar_t)0, '0' - 1).add_set_range('9' + 1, 'A' - 1)
+					.add_set_range('Z' + 1, (wchar_t)94)
+					.add_set_range((wchar_t)96).add_set_range((wchar_t)123, (wchar_t)65535);
 				setchar = true;
 				break;
 			default:

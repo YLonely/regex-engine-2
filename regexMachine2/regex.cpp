@@ -9,6 +9,9 @@ using std::wstring;
 using regex_engine2_parser::regex_parse;
 using regex_engine2_astnode::node_ptr;
 
+using std::pair;
+using std::make_pair;
+
 void parse(wstring regex)
 {
 	vector<node_ptr> *nodes = regex_parse(std::move(regex));
@@ -32,25 +35,75 @@ bool Regex::match(wstring teststring)
 	return false;
 }
 
-//EdgeSet & EdgeSet::add_edge(edge)
-//{
-//	// TODO: 在此处插入 return 语句
-//}
-
-std::vector<int> EdgeSet::get_edge_index(edge)
+EdgeSet & EdgeSet::add_edge(edge e)
 {
-	return std::vector<int>();
+	if (e_set.empty())
+		e_set.push_back(std::move(e));
+	else
+	{
+		vector<edge> temp;
+		for (auto &it = e_set.begin(); it != e_set.end(); ++it)
+		{
+			if (e.second < it->first)
+			{
+				temp.push_back(std::move(e));
+				temp.insert(temp.end(), it, e_set.end());
+				break;
+			} else if (e.first <= it->first&&e.second >= it->first&&e.second <= it->second)
+			{
+				if (e.first == it->first&&e.second == it->second)
+				{
+					temp.insert(temp.end(), it, e_set.end());
+				} else if (e.first == it->first)
+				{
+					temp.push_back({ e.first,e.second });
+					temp.push_back({ e.second + 1,it->second });
+					temp.insert(temp.end(), it + 1, e_set.end());
+				} else if (e.second == it->second)
+				{
+					temp.push_back({ e.first,it->first - 1 });
+					temp.push_back({ it->first,it->second });
+					temp.insert(temp.end(), it + 1, e_set.end());
+				} else
+				{
+					temp.push_back({ e.first,it->first - 1 });
+					temp.push_back({ it->first,e.second });
+					temp.push_back({ e.second + 1,it->second });
+					temp.insert(temp.end(), it + 1, e_set.end());
+				}
+				break;
+			}
+		}
+	}
 }
 
-int EdgeSet::get_edge_index(wchar_t)
+std::vector<index_t> EdgeSet::get_edge_index(edge)
 {
-	return 0;
+	return std::vector<index_t>();
 }
 
-//edge & EdgeSet::get_edge(int index)
-//{
-//	// TODO: 在此处插入 return 语句
-//}
+index_t EdgeSet::get_edge_index(wchar_t ch)
+{
+	index_t index = e_set.size();
+	if (e_set.empty())
+		return index;
+	for (index_t i = 0; i < e_set.size(); ++i)
+	{
+		if (ch >= e_set[i].first&&ch <= e_set[i].second)
+		{
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+edge EdgeSet::get_edge(index_t index)
+{
+	if (index >= e_set.size())
+		throw std::runtime_error("Get edge out of range.");
+	return e_set[index];
+}
 
 
 }

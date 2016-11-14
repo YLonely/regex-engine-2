@@ -11,7 +11,6 @@ int main()
 	try
 	{
 		regex_engine2_regex::Regex c(L"[\\S-d]");
-
 	}
 	catch (const std::exception& e)
 	{

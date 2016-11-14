@@ -19,19 +19,20 @@ void RangeNode::accept_visitor(IVisitor visitor)
 
 SetNode &SetNode::add_set_range(const wchar_t &ch1, const wchar_t &ch2)
 {
-	set.push_back(make_pair(ch1, ch2));
+	set.push_back({ ch1, ch2 });
 	return *this;
 }
 
 SetNode &SetNode::add_set_range(const wchar_t &ch)
 {
-	set.push_back(make_pair(ch, ch));
+	set.push_back({ ch, ch });
 	return *this;
 }
 
 
 /*
-	This function will 1.merge the duplicate characters in the SetNode.	i.e [aba-d] will be transfered into [a-d].
+	This function will
+	1.merge the duplicate characters in the SetNode.	i.e [aba-d] will be transfered into [a-d].
 	2.reverse the negetive set to positive character range.
 */
 void SetNode::merge()
@@ -56,7 +57,7 @@ void SetNode::merge()
 					temp1 = it1->first;
 					temp2 = it1->second > (it2 - 1)->second ? it1->second : (it2 - 1)->second;
 					it1 = set.erase(it1, it2);
-					it1 = set.insert(it1, make_pair(temp1, temp2));
+					it1 = set.insert(it1, { temp1, temp2 });
 					it2 = it1 + 1;
 					count = 1;
 				} else
@@ -76,20 +77,20 @@ void SetNode::merge()
 		if (set.size() == 1)
 		{
 			if (set[0].first > (wchar_t)0)
-				set3.push_back(make_pair((wchar_t)0, set[0].first - 1));
+				set3.push_back({ (wchar_t)0, set[0].first - 1 });
 			if (set[0].second < (wchar_t)65535)
-				set3.push_back(make_pair(set[0].second + 1, (wchar_t)65535));
+				set3.push_back({ set[0].second + 1, (wchar_t)65535 });
 		} else
 		{
 			auto it1 = set.begin(), it2 = set.begin() + 1;
 			for (; it2 != set.end(); ++it1, ++it2)
 			{
 				if (it1 == set.begin() && it1->first >(wchar_t)0)
-					set3.push_back(make_pair((wchar_t)0, it1->first - 1));
-				set3.push_back(make_pair(it1->second + 1, it2->first - 1));
+					set3.push_back({ (wchar_t)0, it1->first - 1 });
+				set3.push_back({ it1->second + 1, it2->first - 1 });
 			}
 			if (it1->second < (wchar_t)65535)
-				set3.push_back(make_pair(it1->second + 1, (wchar_t)65535));
+				set3.push_back({ it1->second + 1, (wchar_t)65535 });
 		}
 		set = std::move(set3);
 	}

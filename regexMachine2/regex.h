@@ -6,15 +6,18 @@ namespace regex_engine2_regex {
 
 
 typedef std::pair<wchar_t, wchar_t> edge;
+typedef std::vector<edge>::size_type index_t;
+
+
 class EdgeSet
 {
 public:
-	//EdgeSet &add_edge(edge);
-	std::vector<int> get_edge_index(edge);
-	int get_edge_index(wchar_t);
-	//edge &get_edge(int index);
+	EdgeSet &add_edge(edge);
+	std::vector<index_t> get_edge_index(edge);
+	index_t get_edge_index(wchar_t);
+	edge get_edge(index_t index);
 private:
-	std::vector<edge> set;
+	std::vector<edge> e_set;
 };
 
 
@@ -32,6 +35,7 @@ public:
 private:
 	std::wstring regex;
 	std::wstring result;
+	EdgeSet set;
 };
 
 }
