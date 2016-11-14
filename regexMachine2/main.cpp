@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-
+#include "regex.h"
 
 int main()
 {
@@ -10,7 +10,7 @@ int main()
 	//Regex b(L"[^a-m]");
 	try
 	{
-		Regex c(L"[\\S-d]");
+		regex_engine2_regex::Regex c(L"[\\S-d]");
 
 	}
 	catch (const std::exception& e)

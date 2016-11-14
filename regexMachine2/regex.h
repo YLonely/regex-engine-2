@@ -1,14 +1,18 @@
 #pragma once
 #include "regex_ast.h"
 
+
+namespace regex_engine2_regex {
+
+
 typedef std::pair<wchar_t, wchar_t> edge;
 class EdgeSet
 {
 public:
-	EdgeSet &add_edge(edge);
+	//EdgeSet &add_edge(edge);
 	std::vector<int> get_edge_index(edge);
 	int get_edge_index(wchar_t);
-	edge &get_edge(int index);
+	//edge &get_edge(int index);
 private:
 	std::vector<edge> set;
 };
@@ -29,3 +33,5 @@ private:
 	std::wstring regex;
 	std::wstring result;
 };
+
+}

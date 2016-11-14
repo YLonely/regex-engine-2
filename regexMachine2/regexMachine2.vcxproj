@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="regex.h" />
     <ClInclude Include="regex_ast.h" />
+    <ClInclude Include="regex_parse.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="visitor.h" />

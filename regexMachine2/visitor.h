@@ -1,5 +1,10 @@
 #pragma once
 #include "regex_ast.h"
+
+namespace regex_engine2_visitor {
+
+using namespace regex_engine2_astnode;
+
 class IVisitor
 {
 public:
@@ -28,3 +33,5 @@ public:
 private:
 	std::vector<std::pair<wchar_t, wchar_t>> edge_set;
 };
+
+}

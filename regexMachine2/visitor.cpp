@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+
+namespace regex_engine2_visitor {
+
+
 void EdgeSetConstructorVisitor::visit(CharNode)
 {
 
@@ -24,4 +28,6 @@ void EdgeSetConstructorVisitor::visit(PlusNode)
 
 void EdgeSetConstructorVisitor::visit(QuesNode)
 {
+}
+
 }

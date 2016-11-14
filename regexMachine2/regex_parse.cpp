@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "regex_parse.h"
 /*
 	The parser for regex.Transform the regex into ast.
 
@@ -30,6 +30,8 @@
 	char-range::= char "-" char
 */
 
+namespace regex_engine2_parser {
+
 using std::pair;
 using std::vector;
 using std::wstring;
@@ -39,9 +41,13 @@ using std::runtime_error;
 using std::make_shared;
 using std::make_pair;
 
-static wstring::size_type index; //the index of regex string.
-static wstring regex;
-static vector<node_ptr> *nodes;
+using namespace regex_engine2_astnode;
+
+namespace {
+
+wstring::size_type index; //the index of regex string.
+wstring regex;
+vector<node_ptr> *nodes;
 
 node_ptr regular_expression();
 node_ptr simple_re();
@@ -50,7 +56,7 @@ node_ptr simple_re();
 /*
 	Helper function
 */
-static bool match(const wchar_t &c)
+bool match(const wchar_t &c)
 {
 	if (index < regex.size() && c == regex[index])
 	{
@@ -60,7 +66,7 @@ static bool match(const wchar_t &c)
 	return false;
 }
 
-static bool is_metachar(const wchar_t &c)
+bool is_metachar(const wchar_t &c)
 {
 	switch (c)
 	{
@@ -84,17 +90,7 @@ static bool is_metachar(const wchar_t &c)
 };
 
 
-vector<node_ptr> *regex_parse(wstring re)
-{
-	regex = std::move(re);
-	nodes = new vector<node_ptr>();
-	index = 0;
-	regular_expression();
-	return nodes;
-}
-
-
-static void set_item(shared_ptr<SetNode> &set)
+void set_item(shared_ptr<SetNode> &set)
 {
 	wchar_t c1, c2;
 	bool setchar = false;
@@ -181,7 +177,7 @@ static void set_item(shared_ptr<SetNode> &set)
 			else
 				set->add_set_range(c1, c2);
 			++index;
-		} else if(!setchar)
+		} else if (!setchar)
 		{
 			set->add_set_range(c1);
 			setchar = false;
@@ -191,7 +187,7 @@ static void set_item(shared_ptr<SetNode> &set)
 
 
 
-static void _char(node_ptr &node)
+void _char(node_ptr &node)
 {
 	if (index >= regex.size())
 		return;
@@ -206,7 +202,7 @@ static void _char(node_ptr &node)
 }
 
 
-static void functional_char(node_ptr &node)
+void functional_char(node_ptr &node)
 {
 	shared_ptr<SetNode> set;
 	wchar_t ch = regex[index];
@@ -248,7 +244,7 @@ static void functional_char(node_ptr &node)
 }
 
 
-static node_ptr elementary_re()
+node_ptr elementary_re()
 {
 
 
@@ -334,7 +330,7 @@ static node_ptr elementary_re()
 	return node;
 }
 
-static pair<int, int> range()
+pair<int, int> range()
 {
 	int num1 = 0, num2 = 0;
 	if (isdigit(regex[index]))
@@ -371,7 +367,7 @@ static pair<int, int> range()
 }
 
 
-static node_ptr basic_re()
+node_ptr basic_re()
 {
 	node_ptr ele = elementary_re();
 	node_ptr temp = nullptr;
@@ -399,7 +395,7 @@ static node_ptr basic_re()
 	return temp;
 }
 
-static node_ptr _union()
+node_ptr _union()
 {
 	/*if (index == regex.size())
 		return nullptr;*/
@@ -419,7 +415,7 @@ static node_ptr _union()
 
 }
 
-static node_ptr concatenation()
+node_ptr concatenation()
 {
 
 	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
@@ -437,7 +433,7 @@ static node_ptr concatenation()
 	}
 }
 
-static node_ptr simple_re()
+node_ptr simple_re()
 {
 	node_ptr left = nullptr, right = nullptr, con_node = nullptr;
 	left = basic_re();
@@ -452,7 +448,7 @@ static node_ptr simple_re()
 	}
 }
 
-static node_ptr regular_expression()
+node_ptr regular_expression()
 {
 	node_ptr left = nullptr, right = nullptr, union_node = nullptr;
 	left = simple_re();
@@ -465,4 +461,17 @@ static node_ptr regular_expression()
 		nodes->push_back(union_node);
 		return union_node;
 	}
+}
+
+}
+
+vector<node_ptr> *regex_parse(wstring re)
+{
+	regex = std::move(re);
+	nodes = new vector<node_ptr>();
+	index = 0;
+	regular_expression();
+	return nodes;
+}
+
 }

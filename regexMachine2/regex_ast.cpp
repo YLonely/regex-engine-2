@@ -1,4 +1,8 @@
 #include "stdafx.h"
+
+
+namespace regex_engine2_astnode {
+
 using std::pair;
 using std::vector;
 using std::make_pair;
@@ -119,4 +123,7 @@ void PlusNode::accept_visitor(IVisitor visitor)
 void QuesNode::accept_visitor(IVisitor visitor)
 {
 	visitor.visit(*this);
+}
+
+
 }

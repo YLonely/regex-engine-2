@@ -2,7 +2,17 @@
 #include <utility>
 #include <vector>
 #include <memory>
+
+namespace regex_engine2_visitor {
+
 class IVisitor;
+
+}
+
+namespace regex_engine2_astnode {
+
+using regex_engine2_visitor::IVisitor;
+
 class IASTNode
 {
 public:
@@ -99,4 +109,6 @@ public:
 private:
 	node_ptr node;
 };
+
+}
 
