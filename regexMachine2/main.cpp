@@ -10,7 +10,12 @@ int main()
 	//Regex b(L"[^a-m]");
 	try
 	{
-		regex_engine2_regex::Regex c(L"[\\S-d]");
+		regex_engine2_regex::EdgeSet e;
+		e.add_edge({ 'a','d' });
+		e.add_edge({ 'e','e' });
+		e.add_edge({ 'x','z' });
+		e.add_edge({ 'a','z' });
+		e.add_edge({ 'g','j' });
 	}
 	catch (const std::exception& e)
 	{

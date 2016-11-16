@@ -54,27 +54,74 @@ EdgeSet & EdgeSet::add_edge(edge e)
 				if (e.first == it->first&&e.second == it->second)
 				{
 					temp.insert(temp.end(), it, e_set.end());
+					break;
 				} else if (e.first == it->first)
 				{
 					temp.push_back({ e.first,e.second });
 					temp.push_back({ e.second + 1,it->second });
-					temp.insert(temp.end(), it + 1, e_set.end());
 				} else if (e.second == it->second)
 				{
 					temp.push_back({ e.first,it->first - 1 });
 					temp.push_back({ it->first,it->second });
-					temp.insert(temp.end(), it + 1, e_set.end());
 				} else
 				{
 					temp.push_back({ e.first,it->first - 1 });
 					temp.push_back({ it->first,e.second });
 					temp.push_back({ e.second + 1,it->second });
-					temp.insert(temp.end(), it + 1, e_set.end());
 				}
+				temp.insert(temp.end(), it + 1, e_set.end());
+				break;
+			} else if (e.first <= it->first&&e.second > it->second)
+			{
+				if (e.first == it->first)
+				{
+					temp.push_back({ it->first,it->second });
+				} else
+				{
+					temp.push_back({ e.first,it->first - 1 });
+					temp.push_back({ it->first,it->second });
+				}
+				e.first = it->second + 1;
+			} else if (e.second <= it->second&&e.first > it->first)
+			{
+				if (e.second == it->second)
+				{
+					temp.push_back({ it->first,e.first - 1 });
+					temp.push_back({ e.first,e.second });
+				} else
+				{
+					temp.push_back({ it->first,e.first - 1 });
+					temp.push_back({ e.first,e.second });
+					temp.push_back({ e.second + 1,it->second });
+				}
+				temp.insert(temp.end(), it + 1, e_set.end());
+				break;
+			} else if (e.second > it->second&&e.first >= it->first&&e.first <= it->second)
+			{
+				if (e.first == it->first)
+				{
+					temp.push_back({ it->first,it->second });
+				} else if (e.first == it->second)
+				{
+					temp.push_back({ it->first,e.first - 1 });
+					temp.push_back({ e.first,e.first });
+				} else
+				{
+					temp.push_back({ it->first,e.first - 1 });
+					temp.push_back({ e.first,it->second });
+				}
+				e.first = it->second + 1;
+			} else
+				temp.push_back(*it);
+			if (it + 1 == e_set.end())
+			{
+				temp.push_back(std::move(e));
 				break;
 			}
 		}
+		e_set = std::move(temp);
 	}
+	return *this;
 }
 
 std::vector<index_t> EdgeSet::get_edge_index(edge)
