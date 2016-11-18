@@ -1,8 +1,10 @@
 #pragma once
 #include "regex_ast.h"
+#include "regex.h"
 
 namespace regex_engine2_visitor {
 
+using  regex_engine2_regex::EdgeSet;
 using namespace regex_engine2_astnode;
 
 class IVisitor
@@ -22,16 +24,15 @@ public:
 class EdgeSetConstructorVisitor :public IVisitor
 {
 public:
-	void visit(CharNode) override;
-	void visit(RangeNode) override;
+	inline void visit(CharNode n) override {
+		set.add_edge({ n.get_char(),n.get_char() });
+	}
 	void visit(SetNode) override;
-	/*void visit(ConcatenationNode) override;
-	void visit(AlternationNode) override;*/
-	void visit(StarNode) override;
-	void visit(PlusNode) override;
-	void visit(QuesNode) override;
+	inline EdgeSet get_set() {
+		return set;
+	}
 private:
-	std::vector<std::pair<wchar_t, wchar_t>> edge_set;
+	EdgeSet set;
 };
 
 }

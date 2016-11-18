@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "regex.h"
 #include "regex_parse.h"
+#include "visitor.h"
+#include "automata.h"
 
 namespace regex_engine2_regex {
 
@@ -8,26 +10,40 @@ using std::vector;
 using std::wstring;
 using regex_engine2_parser::regex_parse;
 using regex_engine2_astnode::node_ptr;
+using regex_engine2_visitor::EdgeSetConstructorVisitor;
+using regex_engine2_automata::Automata;
 
 using std::pair;
 using std::make_pair;
 
-void parse(wstring regex)
+void dfa_minimize(Automata &dfa)
 {
-	vector<node_ptr> *nodes = regex_parse(std::move(regex));
 
 }
 
-
-Regex::Regex(wstring re)
+void nfa_to_dfa(Automata &nfa)
 {
-	set_regex(std::move(re));
+
+}
+
+void nodes_to_nfa(vector<node_ptr> &nodes)
+{
+
+}
+
+void parse(Regex &re)
+{
+	vector<node_ptr> *nodes = regex_parse(re.regex);
+	EdgeSetConstructorVisitor e_visitor;
+	for (auto &n : *nodes)
+		n->accept_visitor(e_visitor);
+	re.set = std::move(e_visitor.get_set());
 }
 
 void Regex::set_regex(wstring re)
 {
 	regex = std::move(re);
-	parse(regex);
+	parse(*this);
 }
 
 bool Regex::match(wstring teststring)
@@ -124,9 +140,31 @@ EdgeSet & EdgeSet::add_edge(edge e)
 	return *this;
 }
 
-std::vector<index_t> EdgeSet::get_edge_index(edge)
+std::vector<index_t> EdgeSet::get_edge_index(edge e)
 {
-	return std::vector<index_t>();
+	vector<index_t> temp;
+	bool state = false;
+	for (index_t i = 0; i < e_set.size(); ++i)
+	{
+		if (!state&&e.first == e_set[i].first)
+		{
+			state = true;
+			temp.push_back(i);
+			if (e.second == e_set[i].second)
+			{
+				state = false;
+				break;
+			}
+		} else if (state&&e.second == e_set[i].second)
+		{
+			state = false;
+			temp.push_back(i);
+		} else if (state)
+			temp.push_back(i);
+	}
+	if (state)
+		return{};
+	return temp;
 }
 
 index_t EdgeSet::get_edge_index(wchar_t ch)

@@ -8,7 +8,10 @@ namespace regex_engine2_regex {
 typedef std::pair<wchar_t, wchar_t> edge;
 typedef std::vector<edge>::size_type index_t;
 
-
+/*
+	The class which stores the char range of the regex,
+	and devide the range into non-intersect range set.
+*/
 class EdgeSet
 {
 public:
@@ -23,10 +26,13 @@ private:
 
 class Regex
 {
+	friend void parse(Regex &);
 public:
 	Regex() = default;
-	Regex(std::wstring re);
-	inline void set_regex(std::wstring re);
+	Regex(std::wstring re) {
+		set_regex(std::move(re));
+	}
+	void set_regex(std::wstring re);
 
 	bool match(std::wstring teststring);
 	inline std::wstring &get_result() {

@@ -146,6 +146,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="automata.h" />
     <ClInclude Include="regex.h" />
     <ClInclude Include="regex_ast.h" />
     <ClInclude Include="regex_parse.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="visitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="automata.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="regex.cpp" />
     <ClCompile Include="regex_ast.cpp" />

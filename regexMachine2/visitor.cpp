@@ -4,30 +4,14 @@
 namespace regex_engine2_visitor {
 
 
-void EdgeSetConstructorVisitor::visit(CharNode)
-{
 
+
+void EdgeSetConstructorVisitor::visit(SetNode n)
+{
+	auto &set = n.get_set();
+	for (auto &i : set)
+		this->set.add_edge(i);
 }
 
-void EdgeSetConstructorVisitor::visit(RangeNode)
-{
-}
-
-void EdgeSetConstructorVisitor::visit(SetNode)
-{
-}
-
-
-void EdgeSetConstructorVisitor::visit(StarNode)
-{
-}
-
-void EdgeSetConstructorVisitor::visit(PlusNode)
-{
-}
-
-void EdgeSetConstructorVisitor::visit(QuesNode)
-{
-}
 
 }
