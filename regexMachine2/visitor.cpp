@@ -6,7 +6,7 @@ namespace regex_engine2_visitor {
 
 
 
-void EdgeSetConstructorVisitor::visit(SetNode n)
+void EdgeSetConstructVisitor::visit(SetNode n)
 {
 	auto &set = n.get_set();
 	for (auto &i : set)

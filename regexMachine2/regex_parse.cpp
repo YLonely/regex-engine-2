@@ -352,14 +352,14 @@ pair<int, int> range()
 		if (isdigit(regex[index]))
 			num2 = regex[index++] - '0';
 		else
-			throw runtime_error("Missing argument next to the ','.");
+			num2 = -1;
 		while (isdigit(regex[index]))
 		{
 			num2 = num2 * 10 + regex[index] - '0';
 			++index;
 		}
 		if (match('}'))
-			if (num1 >= num2)
+			if (num1 >= num2&&num2 != -1)
 				throw runtime_error("In the operation \"{num1,num2}\",num1 must be smaller than num2.");
 			else
 				return make_pair(num1, num2);

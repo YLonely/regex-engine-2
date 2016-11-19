@@ -10,7 +10,7 @@ using std::vector;
 using std::wstring;
 using regex_engine2_parser::regex_parse;
 using regex_engine2_astnode::node_ptr;
-using regex_engine2_visitor::EdgeSetConstructorVisitor;
+using regex_engine2_visitor::EdgeSetConstructVisitor;
 using regex_engine2_automata::Automata;
 
 using std::pair;
@@ -34,7 +34,7 @@ void nodes_to_nfa(vector<node_ptr> &nodes)
 void parse(Regex &re)
 {
 	vector<node_ptr> *nodes = regex_parse(re.regex);
-	EdgeSetConstructorVisitor e_visitor;
+	EdgeSetConstructVisitor e_visitor;
 	for (auto &n : *nodes)
 		n->accept_visitor(e_visitor);
 	re.set = std::move(e_visitor.get_set());

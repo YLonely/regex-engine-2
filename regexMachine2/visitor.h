@@ -21,7 +21,7 @@ public:
 	virtual void visit(QuesNode) {}
 };
 
-class EdgeSetConstructorVisitor :public IVisitor
+class EdgeSetConstructVisitor :public IVisitor
 {
 public:
 	inline void visit(CharNode n) override {
@@ -33,6 +33,11 @@ public:
 	}
 private:
 	EdgeSet set;
+};
+
+class NFAConstructVisitor :public IVisitor
+{
+	
 };
 
 }

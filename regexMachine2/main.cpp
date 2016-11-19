@@ -12,7 +12,7 @@ int main()
 	//Regex b(L"[^a-m]");
 	try
 	{
-		Regex a(L"a[x-z]|[a-z]*e");
+		Regex a(L"(ab)(cd)");
 	}
 	catch (const std::exception& e)
 	{
