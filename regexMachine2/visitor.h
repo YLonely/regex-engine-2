@@ -1,11 +1,20 @@
 #pragma once
+#include <vector>
 #include "regex_ast.h"
 #include "regex.h"
+#include "automata.h"
+
 
 namespace regex_engine2_visitor {
 
 using  regex_engine2_regex::EdgeSet;
 using namespace regex_engine2_astnode;
+
+using regex_engine2_automata::Status;
+using regex_engine2_automata::Edge;
+using regex_engine2_automata::Automata;
+using regex_engine2_automata::edge_ptr;
+using regex_engine2_automata::status_ptr;
 
 class IVisitor
 {
@@ -37,7 +46,20 @@ private:
 
 class NFAConstructVisitor :public IVisitor
 {
-	
+public:
+	NFAConstructVisitor() = delete;
+	NFAConstructVisitor(EdgeSet e) :set(std::move(e)) {}
+	void visit(CharNode) override;
+	void visit(ConcatenationNode) override;
+private:
+	std::vector<status_ptr> stack;
+	int state_index = 0;
+	EdgeSet set;
+	Automata NFA;
 };
 
 }
+
+
+
+
