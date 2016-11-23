@@ -19,11 +19,11 @@ typedef std::shared_ptr<Edge> edge_ptr;
 class Status
 {
 	friend class regex_engine2_visitor::NFAConstructVisitor;
+	friend class Edge;
 public:
 	Status() = default;
-	Status(std::vector<edge_ptr> in, decltype(in) out) :in_edges(std::move(in)), out_edges(std::move(out)) {}
+	Status(int index) :index(index) {}
 private:
-	void append(Status&);
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
 	bool final_status = false;
@@ -36,10 +36,9 @@ typedef std::shared_ptr<Status> status_ptr;
 class Edge
 {
 	friend class regex_engine2_visitor::NFAConstructVisitor;
-	friend class Status;
 public:
 	Edge() = default;
-	Edge(status_ptr start, status_ptr end, std::vector<index_t> content = std::vector<index_t>()) :start(std::move(start)), end(std::move(end)), match_content(content) {}
+	Edge(std::vector<index_t> content) :match_content(std::move(content)) {}
 private:
 	std::vector<index_t> match_content;
 	status_ptr start;

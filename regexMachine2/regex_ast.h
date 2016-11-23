@@ -44,7 +44,7 @@ public:
 private:
 	node_ptr node;
 	int min;
-	int max;	//max=-1 means infinity
+	int max;	//max = -1 means infinity
 };
 
 class SetNode :public IASTNode
@@ -114,6 +114,13 @@ public:
 	void accept_visitor(IVisitor &visitor) override;
 private:
 	node_ptr node;
+};
+
+class EndOfString :public IASTNode
+{
+public:
+	EndOfString() = default;
+	void accept_visitor(IVisitor &visitor) override;
 };
 
 }

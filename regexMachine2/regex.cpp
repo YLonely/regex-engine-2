@@ -171,7 +171,23 @@ std::vector<index_t> EdgeSet::get_edge_index(edge e)
 	return temp;
 }
 
-index_t EdgeSet::get_edge_index(wchar_t ch)
+/*
+	edges must be non-intersect and only be used for SetNode.
+*/
+std::vector<index_t> EdgeSet::get_edge_index(std::vector<edge> edges)
+{
+	vector<index_t> result;
+	vector<index_t> temp;
+	for (auto &e : edges)
+	{
+		temp = std::move(get_edge_index(e));
+		for (auto &i : temp)
+			result.push_back(i);
+	}
+	return result;
+}
+
+index_t EdgeSet::get_edge_index(wchar_t &ch)
 {
 	index_t index = e_set.size();
 	if (e_set.empty())

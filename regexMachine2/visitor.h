@@ -15,6 +15,7 @@ using regex_engine2_automata::Edge;
 using regex_engine2_automata::Automata;
 using regex_engine2_automata::edge_ptr;
 using regex_engine2_automata::status_ptr;
+using std::make_shared;
 
 class IVisitor
 {
@@ -28,6 +29,7 @@ public:
 	virtual void visit(StarNode) {}
 	virtual void visit(PlusNode) {}
 	virtual void visit(QuesNode) {}
+	virtual void visit(EndOfString) {}
 };
 
 class EdgeSetConstructVisitor :public IVisitor
@@ -51,8 +53,34 @@ public:
 	NFAConstructVisitor(EdgeSet e) :set(std::move(e)) {}
 	void visit(CharNode) override;
 	void visit(ConcatenationNode) override;
+	void visit(RangeNode) override;
+	void visit(SetNode) override;
+	void visit(AlternationNode) override;
+	void visit(StarNode) override;
+	void visit(PlusNode) override;
+	void visit(QuesNode) override;
+	void visit(EndOfString) override;
 private:
-	std::vector<status_ptr> stack;
+	class Fragment
+	{
+	public:
+		Fragment() = delete;
+		Fragment(status_ptr &start, std::vector<edge_ptr> out)
+			:start(start), out_edges(std::move(out)) {}
+		void append(Fragment &);
+		inline status_ptr& get_start() {
+			return start;
+		}
+		inline std::vector<edge_ptr>& get_out() {
+			return out_edges;
+		}
+	private:
+		status_ptr start;
+		std::vector<edge_ptr> out_edges;
+	};
+	void connect(status_ptr &, edge_ptr &, status_ptr &);
+	void attach(status_ptr &, edge_ptr &);
+	std::vector<Fragment> stack;
 	int state_index = 0;
 	EdgeSet set;
 	Automata NFA;

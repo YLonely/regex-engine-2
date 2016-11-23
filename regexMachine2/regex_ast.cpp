@@ -127,4 +127,9 @@ void QuesNode::accept_visitor(IVisitor &visitor)
 }
 
 
+void EndOfString::accept_visitor(IVisitor & visitor)
+{
+	visitor.visit(*this);
+}
+
 }

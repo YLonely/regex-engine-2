@@ -474,6 +474,7 @@ vector<node_ptr> *regex_parse(wstring re)
 	nodes = new vector<node_ptr>();
 	index = 0;
 	regular_expression();
+	nodes->push_back(make_shared<EndOfString>());
 	return nodes;
 }
 
