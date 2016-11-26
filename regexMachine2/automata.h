@@ -39,11 +39,16 @@ class Edge
 public:
 	Edge() = default;
 	Edge(std::vector<index_t> content) :match_content(std::move(content)) {}
+	Edge(bool range, int min, int max) :range(range), min(min), max(max) {}
 private:
 	std::vector<index_t> match_content;
 	status_ptr start;
 	status_ptr end;
-
+	bool range = false;
+	bool available = true;
+	int min;
+	int max;
+	unsigned int count = 0;
 };
 
 

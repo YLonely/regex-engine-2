@@ -41,6 +41,9 @@ public:
 	RangeNode() = delete;
 	RangeNode(node_ptr node, int min, int max) :node(node), min(min), max(max) {}
 	void accept_visitor(IVisitor &visitor) override;
+	std::pair<int, int> get_range() {
+		return{ min,max };
+	}
 private:
 	node_ptr node;
 	int min;

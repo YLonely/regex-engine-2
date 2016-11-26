@@ -81,7 +81,7 @@ private:
 	void connect(status_ptr &, edge_ptr &, status_ptr &);
 	void attach(status_ptr &, edge_ptr &);
 	std::vector<Fragment> stack;
-	int state_index = 0;
+	int status_index = 0;
 	EdgeSet set;
 	Automata NFA;
 };
