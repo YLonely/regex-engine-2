@@ -41,7 +41,7 @@ using std::runtime_error;
 using std::make_shared;
 using std::make_pair;
 
-using namespace regex_engine2_astnode;
+using namespace regex_engine2_ast;
 
 namespace {
 
@@ -468,14 +468,15 @@ node_ptr regular_expression()
 
 }
 
-vector<node_ptr> *regex_parse(wstring re)
+AST regex_parse(wstring re)
 {
 	regex = std::move(re);
 	nodes = new vector<node_ptr>();
 	index = 0;
 	regular_expression();
-	nodes->push_back(make_shared<EndOfString>());
-	return nodes;
+	nodes->push_back(make_shared<EndOfString>(nodes->back()));
+	delete nodes;
+	return AST(nodes);
 }
 
 }

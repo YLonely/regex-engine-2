@@ -9,7 +9,7 @@ class IVisitor;
 
 }
 
-namespace regex_engine2_astnode {
+namespace regex_engine2_ast {
 
 using regex_engine2_visitor::IVisitor;
 
@@ -21,6 +21,24 @@ public:
 };
 
 typedef std::shared_ptr<IASTNode> node_ptr;
+
+
+class AST
+{
+public:
+	AST() = default;
+	AST(std::vector<node_ptr> *nodes) :nodes(nodes) {}
+	inline std::vector<node_ptr> *&get_nodes() {
+		return nodes;
+	}
+	inline node_ptr get_root() {
+		return nodes->back();
+	}
+	void release_nodes();
+private:
+	std::vector<node_ptr> *nodes;
+};
+
 
 class CharNode :public IASTNode
 {
@@ -123,7 +141,10 @@ class EndOfString :public IASTNode
 {
 public:
 	EndOfString() = default;
+	EndOfString(node_ptr node) :node(node) {}
 	void accept_visitor(IVisitor &visitor) override;
+private:
+	node_ptr node;
 };
 
 }

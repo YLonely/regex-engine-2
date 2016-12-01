@@ -4,7 +4,7 @@
 #include "regex_ast.h"
 namespace regex_engine2_parser {
 
-using regex_engine2_astnode::node_ptr;
-std::vector<node_ptr> *regex_parse(std::wstring re);
+using regex_engine2_ast::node_ptr;
+AST regex_parse(std::wstring re);
 
 }

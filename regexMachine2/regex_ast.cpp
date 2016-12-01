@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 
-namespace regex_engine2_astnode {
+namespace regex_engine2_ast {
 
 using std::pair;
 using std::vector;
@@ -130,6 +130,11 @@ void QuesNode::accept_visitor(IVisitor &visitor)
 void EndOfString::accept_visitor(IVisitor & visitor)
 {
 	visitor.visit(*this);
+}
+
+void AST::release_nodes()
+{
+	
 }
 
 }

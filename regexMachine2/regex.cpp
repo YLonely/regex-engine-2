@@ -9,7 +9,7 @@ namespace regex_engine2_regex {
 using std::vector;
 using std::wstring;
 using regex_engine2_parser::regex_parse;
-using regex_engine2_astnode::node_ptr;
+using regex_engine2_ast::node_ptr;
 using regex_engine2_visitor::EdgeSetConstructVisitor;
 using regex_engine2_visitor::NFAConstructVisitor;
 using regex_engine2_automata::Automata;
