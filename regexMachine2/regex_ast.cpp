@@ -7,14 +7,14 @@ using std::pair;
 using std::vector;
 using std::make_pair;
 
-void CharNode::accept_visitor(IVisitor &visitor)
+void CharNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void RangeNode::accept_visitor(IVisitor &visitor)
+void RangeNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
 SetNode &SetNode::add_set_range(const wchar_t &ch1, const wchar_t &ch2)
@@ -96,45 +96,40 @@ void SetNode::merge()
 	}
 }
 
-void SetNode::accept_visitor(IVisitor &visitor)
+void SetNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void ConcatenationNode::accept_visitor(IVisitor &visitor)
+void ConcatenationNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void AlternationNode::accept_visitor(IVisitor &visitor)
+void AlternationNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void StarNode::accept_visitor(IVisitor &visitor)
+void StarNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void PlusNode::accept_visitor(IVisitor &visitor)
+void PlusNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
-void QuesNode::accept_visitor(IVisitor &visitor)
+void QuesNode::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
+	visitor->visit(this);
 }
 
 
-void EndOfString::accept_visitor(IVisitor & visitor)
+void EndOfString::accept_visitor(IVisitor *visitor)
 {
-	visitor.visit(*this);
-}
-
-void AST::release_nodes()
-{
-	
+	visitor->visit(this);
 }
 
 }

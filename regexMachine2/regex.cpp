@@ -10,6 +10,7 @@ using std::vector;
 using std::wstring;
 using regex_engine2_parser::regex_parse;
 using regex_engine2_ast::node_ptr;
+using regex_engine2_ast::AST;
 using regex_engine2_visitor::EdgeSetConstructVisitor;
 using regex_engine2_visitor::NFAConstructVisitor;
 using regex_engine2_automata::Automata;
@@ -27,21 +28,20 @@ void nfa_to_dfa(Automata &nfa)
 
 }
 
-void nodes_to_nfa(vector<node_ptr> *&nodes, EdgeSet &set)
+void nodes_to_nfa(AST &ast, EdgeSet &set)
 {
 	NFAConstructVisitor nfa_visitor(set);
-	for (auto &n : *nodes)
-		n->accept_visitor(nfa_visitor);
+	Automata nfa = nfa_visitor.invoke(ast.get_root());
 }
 
 void parse(Regex &re)
 {
-	vector<node_ptr> *nodes = regex_parse(re.regex);
+	AST ast = regex_parse(re.regex);
 	EdgeSetConstructVisitor e_visitor;
-	for (auto &n : *nodes)
-		n->accept_visitor(e_visitor);
+	for (auto &n : *(ast.get_nodes()))
+		n->accept_visitor(&e_visitor);
 	re.set = std::move(e_visitor.get_set());
-	nodes_to_nfa(nodes, re.set);
+	nodes_to_nfa(ast, re.set);
 }
 
 void Regex::set_regex(wstring re)

@@ -22,11 +22,11 @@ class Status
 	friend class Edge;
 public:
 	Status() = default;
-	Status(int index) :index(index) {}
+	Status(int index, bool final = false) :index(index), is_final(final) {}
 private:
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
-	bool final_status = false;
+	bool is_final = false;
 	int index = -1;
 
 };
@@ -39,36 +39,23 @@ class Edge
 public:
 	Edge() = default;
 	Edge(std::vector<index_t> content) :match_content(std::move(content)) {}
-	Edge(bool range, int min, int max) :range(range), min(min), max(max) {}
 private:
 	std::vector<index_t> match_content;
 	status_ptr start;
 	status_ptr end;
-	bool range = false;
-	bool available = true;
-	int min;
-	int max;
-	unsigned int count = 0;
 };
 
 
 
 class Automata
 {
-private:
+public:
+	Automata() = default;
+	Automata(status_ptr &start, status_ptr &end) :start(start), end(end) {}
 	std::vector<edge_ptr> all_edges;
 	std::vector<status_ptr> all_status;
-	status_ptr entry;
-public:
-	inline std::vector<edge_ptr> & get_edges() {
-		return all_edges;
-	}
-	inline std::vector<status_ptr> & get_status() {
-		return all_status;
-	}
-	inline status_ptr &get_entry() {
-		return entry;
-	}
+	status_ptr start;
+	status_ptr end;
 };
 
 

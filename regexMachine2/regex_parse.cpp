@@ -47,7 +47,7 @@ namespace {
 
 wstring::size_type index; //the index of regex string.
 wstring regex;
-vector<node_ptr> *nodes;
+std::unique_ptr<vector<node_ptr>> nodes;
 
 node_ptr regular_expression();
 node_ptr simple_re();
@@ -325,8 +325,9 @@ node_ptr elementary_re()
 		nodes->push_back(node);
 	} else if (match('.'))
 	{
-		node = make_shared<CharNode>('.');
-		nodes->push_back(node);
+		auto n = make_shared<SetNode>(true);
+		n->add_set_range((wchar_t)0, (wchar_t)65535);
+		nodes->push_back(n);
 	} else
 		_char(node);
 
@@ -471,12 +472,12 @@ node_ptr regular_expression()
 AST regex_parse(wstring re)
 {
 	regex = std::move(re);
-	nodes = new vector<node_ptr>();
+	nodes.reset(new vector<node_ptr>());
 	index = 0;
 	regular_expression();
 	nodes->push_back(make_shared<EndOfString>(nodes->back()));
-	delete nodes;
-	return AST(nodes);
+	AST ast(nodes.release());
+	return ast;
 }
 
 }

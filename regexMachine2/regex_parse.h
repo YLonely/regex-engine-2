@@ -5,6 +5,6 @@
 namespace regex_engine2_parser {
 
 using regex_engine2_ast::node_ptr;
-AST regex_parse(std::wstring re);
+regex_engine2_ast::AST regex_parse(std::wstring re);
 
 }
