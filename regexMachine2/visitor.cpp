@@ -5,13 +5,14 @@ namespace regex_engine2_visitor {
 
 
 
-void NFAConstructVisitor::connect(Automata &a, status_ptr &s)
+Automata NFAConstructVisitor::connect(Automata &a, status_ptr &s)
 {
 	edge_ptr epsilon_edge = make_shared<Edge>();
 	epsilon_edge->start = a.end;
 	epsilon_edge->end = s;
 	a.end->out_edges.push_back(epsilon_edge);
 	s->in_edges.push_back(epsilon_edge);
+	return Automata(a.start, s);
 }
 
 void NFAConstructVisitor::connect(status_ptr &start, status_ptr &end, edge_ptr e = make_shared<Edge>())
@@ -22,9 +23,14 @@ void NFAConstructVisitor::connect(status_ptr &start, status_ptr &end, edge_ptr e
 	end->in_edges.push_back(e);
 }
 
-void regex_engine2_visitor::NFAConstructVisitor::connect(Automata &start, Automata &end)
+Automata regex_engine2_visitor::NFAConstructVisitor::connect(Automata &start, Automata &end)
 {
+	if (!end.start)
+		return start;
+	if (!start.start)
+		return end;
 	connect(start.end, end.start);
+	return Automata(start.start, end.end);
 }
 
 
@@ -42,13 +48,52 @@ Automata NFAConstructVisitor::apply(ConcatenationNode *n)
 {
 	Automata left = invoke(n->get_left());
 	Automata right = invoke(n->get_right());
-	connect(left, right);
-	return Automata(left.start, right.end);
+	return connect(left, right);
 }
 
 Automata NFAConstructVisitor::apply(RangeNode *n)
 {
-	return Automata();
+	Automata head;
+	int min = n->get_range().first, max = n->get_range().second;
+	if (min == 0 && max == -1)
+	{
+		auto start = make_shared<Status>(status_index++);
+		auto frag = invoke(n->get_node());
+		auto end = make_shared<Status>(status_index++);
+		connect(frag.end, frag.start);
+		connect(frag.end, end);
+
+		connect(start, frag.start);
+		connect(start, end);
+		return Automata(start, end);
+	} else
+	{
+		if (max == -1)
+		{
+			for (int i = 0; i < min - 1; ++i)
+			{
+				auto frag = invoke(n->get_node());
+				head = connect(head, frag);
+			}
+			auto end = invoke(n->get_node());
+			connect(end.end, end.start);
+			return connect(head, end);
+		}
+		for (int i = 0; i < min; ++i)
+		{
+			auto frag = invoke(n->get_node());
+			head = connect(head, frag);
+		}
+		status_ptr end = make_shared<Status>(status_index++);
+		for (int i = 0; i < max - min; ++i)
+		{
+			auto frag = invoke(n->get_node());
+			connect(frag.start, end);
+			head = connect(head, frag);
+		}
+		return connect(head, end);
+	}
+
 }
 
 Automata NFAConstructVisitor::apply(SetNode *n)
@@ -108,8 +153,7 @@ Automata NFAConstructVisitor::apply(QuesNode *n)
 Automata NFAConstructVisitor::apply(EndOfString *end)
 {
 	Automata nfa = invoke(end->get_node());
-	status_ptr final = make_shared<Status>(status_index++, true);
-	connect(nfa, final);
+	nfa.end->is_final = true;
 	return nfa;
 }
 

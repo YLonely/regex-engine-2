@@ -109,9 +109,9 @@ public:
 	Automata apply(QuesNode*);
 	Automata apply(EndOfString*);
 private:
-	void connect(Automata &, status_ptr &);
+	Automata connect(Automata &, status_ptr &);
 	void connect(status_ptr &, status_ptr &, edge_ptr);
-	void connect(Automata &, Automata &);
+	Automata connect(Automata &, Automata &);
 	int status_index = 0;
 	EdgeSet set;
 	Automata NFA;

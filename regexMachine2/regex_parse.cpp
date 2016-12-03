@@ -374,9 +374,11 @@ pair<int, int> range()
 node_ptr basic_re()
 {
 	node_ptr ele = elementary_re();
-	node_ptr temp = nullptr;
+	node_ptr temp;
 	if (match('{'))
 	{
+		if (!ele)
+			throw runtime_error("Missing argument before '{' '}'");
 		if (match('}'))
 			throw runtime_error("Missing argument in '{' '}'");
 		pair<int, int> p = range();
@@ -384,14 +386,20 @@ node_ptr basic_re()
 		nodes->push_back(temp);
 	} else if (match('*'))
 	{
+		if (!ele)
+			throw runtime_error("Missing argument before '*'");
 		temp = make_shared<StarNode>(ele);
 		nodes->push_back(temp);
 	} else if (match('+'))
 	{
+		if (!ele)
+			throw runtime_error("Missing argument before '+'");
 		temp = make_shared<PlusNode>(ele);
 		nodes->push_back(temp);
 	} else if (match('?'))
 	{
+		if (!ele)
+			throw runtime_error("Missing argument before '?'");
 		temp = make_shared<QuesNode>(ele);
 		nodes->push_back(temp);
 	} else
