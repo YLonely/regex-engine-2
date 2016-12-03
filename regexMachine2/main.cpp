@@ -12,7 +12,7 @@ int main()
 	//Regex b(L"[^a-m]");
 	try
 	{
-		Regex a(L"(abc|def){77,145}");
+		Regex a(L"abc|def*");
 	}
 	catch (const std::exception& e)
 	{

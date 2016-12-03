@@ -20,6 +20,9 @@ public:
 	std::vector<index_t> get_edge_index(std::vector<edge>);
 	index_t get_edge_index(wchar_t &);
 	edge get_edge(index_t index);
+	inline auto get_capacity() {
+		return e_set.size();
+	}
 private:
 	std::vector<edge> e_set;
 };
