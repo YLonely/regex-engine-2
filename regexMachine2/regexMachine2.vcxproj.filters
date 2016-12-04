@@ -30,9 +30,6 @@
     <ClInclude Include="regex.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="regex_parse.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="automata.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -60,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="automata.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="automata_parse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

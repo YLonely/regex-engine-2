@@ -10,7 +10,7 @@ namespace regex_engine2_visitor {
 using  regex_engine2_regex::EdgeSet;
 using namespace regex_engine2_ast;
 
-using regex_engine2_automata::Status;
+using regex_engine2_automata::NFAStatus;
 using regex_engine2_automata::Edge;
 using regex_engine2_automata::Automata;
 using regex_engine2_automata::edge_ptr;

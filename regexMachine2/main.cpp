@@ -10,9 +10,11 @@ int main()
 {
 	//Regex a(L"[^a]");
 	//Regex b(L"[^a-m]");
+
+	
 	try
 	{
-		Regex a(L"abc|def*");
+		Regex a(L"ab[d-g]{2,5}cq?e*");
 	}
 	catch (const std::exception& e)
 	{

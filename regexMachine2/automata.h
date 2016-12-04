@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <set>
+#include <list>
 #include "regex.h"
 namespace regex_engine2_visitor {
 class NFAConstructVisitor;
@@ -10,19 +12,19 @@ class NFAConstructVisitor;
 namespace regex_engine2_automata {
 
 using regex_engine2_regex::index_t;
-using regex_engine2_regex::index_set;
+
 
 class Edge;
 typedef std::shared_ptr<Edge> edge_ptr;
 
 
-class Status
+class NFAStatus
 {
 	friend class regex_engine2_visitor::NFAConstructVisitor;
 	friend class Edge;
 public:
-	Status() = default;
-	Status(int index, bool final = false) :index(index), final(final) {}
+	NFAStatus() = default;
+	NFAStatus(int index, bool final = false) :index(index), final(final) {}
 	auto get_in_edges() {
 		return in_edges;
 	}
@@ -43,7 +45,7 @@ private:
 
 };
 
-typedef std::shared_ptr<Status> status_ptr;
+typedef std::shared_ptr<NFAStatus> status_ptr;
 
 class Edge
 {
@@ -51,7 +53,7 @@ class Edge
 public:
 	Edge() = default;
 	Edge(std::vector<index_t> content) :match_content(std::move(content)) {}
-	auto get_match_content() {
+	auto &get_match_content() {
 		return match_content;
 	}
 	auto get_start() {
@@ -67,6 +69,9 @@ private:
 };
 
 
+typedef std::list<status_ptr> status_set;//status set
+typedef std::set<unsigned int> index_set;//index set
+
 class DFAStatus
 {
 public:
@@ -74,11 +79,17 @@ public:
 	DFAStatus(unsigned int capacity) {
 		set_capacity(capacity);
 	}
+	DFAStatus(unsigned int capacity, index_set s, bool final = false) :nfa_index(std::move(s)), final(final) {
+		set_capacity(capacity);
+	}
 	void set_capacity(unsigned int capacity) {
 		status_tran = std::vector<int>(capacity, -1);
 	}
-	void set_index_set(index_set set) {
+	void set_nfa_set(index_set set) {
 		nfa_index = std::move(set);
+	}
+	auto get_nfa_set() const {
+		return nfa_index;
 	}
 	bool is_final() {
 		return final;
@@ -94,6 +105,10 @@ private:
 	index_set nfa_index;
 	bool final = false;
 };
+
+
+typedef std::vector<DFAStatus> Dtran;
+
 
 
 class Automata

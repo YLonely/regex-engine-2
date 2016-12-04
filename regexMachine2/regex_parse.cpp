@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "regex_parse.h"
+#include "regex_ast.h"
+
 /*
 	The parser for regex.Transform the regex into ast.
 

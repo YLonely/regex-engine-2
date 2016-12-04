@@ -1,5 +1,6 @@
 #include "stdafx.h"
-
+#include "regex_ast.h"
+#include "visitor.h"
 
 namespace regex_engine2_ast {
 

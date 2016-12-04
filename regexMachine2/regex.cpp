@@ -1,139 +1,29 @@
 #include "stdafx.h"
 #include "regex.h"
-#include "regex_parse.h"
 #include "visitor.h"
 #include "automata.h"
-#include <set>
-#include <list>
+#include <tuple>
+
+
+namespace regex_engine2_automata_parse {
+std::tuple<regex_engine2_regex::EdgeSet, regex_engine2_automata::Dtran> automata_parse(std::wstring restring);
+}
+
 
 namespace regex_engine2_regex {
 
 using std::vector;
 using std::wstring;
-using regex_engine2_parser::regex_parse;
-using regex_engine2_ast::node_ptr;
-using regex_engine2_ast::AST;
-using regex_engine2_visitor::EdgeSetConstructVisitor;
-using regex_engine2_visitor::NFAConstructVisitor;
-using regex_engine2_automata::Automata;
-using regex_engine2_automata::status_ptr;
-using regex_engine2_automata::edge_ptr;
-using regex_engine2_automata::DFAStatus;
 
 using std::pair;
 using std::make_pair;
-using std::set;
-using std::list;
-
-typedef list<status_ptr> status_set;//status set
-typedef std::set<int> index_set;//index set
-typedef vector<DFAStatus> Dtran;
-
-
-namespace {
-std::vector<status_ptr> all_status;
-
-index_set switch_to_i(status_set s)
-{
-	index_set set;
-	for (auto &k : s)
-		set.insert(k->get_index());
-	return set;
-}
-
-status_set switch_to_s(index_set i)
-{
-	status_set set;
-	for (auto &k : i)
-		set.push_back(all_status[k]);
-	return set;
-}
-
-
-
-status_set epsilon_closure(status_ptr s)
-{
-	status_set set;
-	set.push_back(s);
-	for (auto it = set.begin(); it != set.end(); ++it)
-	{
-		for (auto &e : (*it)->get_out_edges())
-		{
-			if ((e->get_match_content()).size() == 0)
-				set.push_back(e->get_end());
-		}
-	}
-	return set;
-}
-
-
-status_set epsilon_closure(status_set s)
-{
-	index_set set;
-	index_set temp;
-	for (auto &k : s)
-	{
-		temp = switch_to_i(epsilon_closure(k));
-		for (auto &t : temp)
-			set.insert(t);
-	}
-	return switch_to_s(set);
-}
-
-status_set move(status_set set, index_t a)
-{
-	status_set s;
-	for (auto &i : set)
-	{
-		for (auto &e : i->get_out_edges())
-		{
-			auto it = std::find(e->get_match_content().begin(), e->get_match_content().end(), a);
-			if (it != e->get_match_content().end())
-				s.push_back(e->get_end());
-		}
-	}
-}
-
-
-void dfa_minimize(Automata &dfa)
-{
-
-}
-
-Dtran nfa_to_dfa(Automata &nfa, EdgeSet &set)
-{
-	all_status = nfa.all_status;
-	list<index_set> Dstatus;
-	Dstatus.push_back(switch_to_i(epsilon_closure(nfa.start)));
-	for (auto it = Dstatus.begin(); it != Dstatus.end(); ++it)
-	{
-
-	}
-
-
-	all_status.clear();
-}
-
-Automata nodes_to_nfa(AST &ast, EdgeSet &set)
-{
-	NFAConstructVisitor nfa_visitor(set);
-	return nfa_visitor.invoke(ast.get_root());
-}
-
-}
+using std::tuple;
+using regex_engine2_automata_parse::automata_parse;
 
 void parse(Regex &re)
 {
-	AST ast = regex_parse(re.regex);
-	EdgeSetConstructVisitor e_visitor;
-	for (auto &n : *(ast.get_nodes()))
-		n->accept_visitor(&e_visitor);
-	re.set = std::move(e_visitor.get_set());
-	Automata nfa = nodes_to_nfa(ast, re.set);
-
-	ast.release_nodes();//Release the memory of ast nodes.
-
-	nfa_to_dfa(nfa, re.set);
+	auto result = automata_parse(re.regex);
+	re.set = std::move(std::get<0>(result));
 }
 
 void Regex::set_regex(wstring re)
