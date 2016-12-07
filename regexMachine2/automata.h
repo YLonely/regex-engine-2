@@ -11,12 +11,13 @@ class NFAConstructVisitor;
 
 namespace regex_engine2_automata {
 
-using regex_engine2_regex::index_t;
+using regex_engine2_regex::group_index;
 
 
 class Edge;
 typedef std::shared_ptr<Edge> edge_ptr;
-
+typedef int nfa_index;
+typedef int dfa_index;
 
 class NFAStatus
 {
@@ -41,7 +42,7 @@ private:
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
 	bool final = false;
-	int index = -1;
+	nfa_index index = -1;
 
 };
 
@@ -52,7 +53,7 @@ class Edge
 	friend class regex_engine2_visitor::NFAConstructVisitor;
 public:
 	Edge() = default;
-	Edge(std::vector<index_t> content) :match_content(std::move(content)) {}
+	Edge(std::vector<group_index> content) :match_content(std::move(content)) {}
 	auto &get_match_content() {
 		return match_content;
 	}
@@ -63,48 +64,64 @@ public:
 		return end;
 	}
 private:
-	std::vector<index_t> match_content;
+	std::vector<group_index> match_content;
 	status_ptr start;
 	status_ptr end;
 };
 
 
-typedef std::list<status_ptr> status_set;//status set
-typedef std::set<unsigned int> index_set;//index set
+//The list that stores the nfa status;
+typedef std::list<status_ptr> status_set;
+//The set that stores the index of some nfa status
+typedef std::set<nfa_index> index_set;
 
 class DFAStatus
 {
 public:
 	DFAStatus() = default;
-	DFAStatus(unsigned int capacity) {
-		set_capacity(capacity);
+	DFAStatus(index_set s, bool final = false) :
+		contain_nfa(std::move(s)), final(final) {
+		if (capacity == 0)
+			throw std::runtime_error("DFAStatus:capacity==0");
+		status_tran = std::vector<dfa_index>(capacity, -1);
+		index = index_count++;
 	}
-	DFAStatus(unsigned int capacity, index_set s, bool final = false) :nfa_index(std::move(s)), final(final) {
-		set_capacity(capacity);
+	static unsigned int get_capacity() {
+		return capacity;
 	}
-	void set_capacity(unsigned int capacity) {
-		status_tran = std::vector<int>(capacity, -1);
+	static void set_capacity(unsigned int c) {
+		capacity = c;
 	}
 	void set_nfa_set(index_set set) {
-		nfa_index = std::move(set);
+		contain_nfa = std::move(set);
 	}
 	auto get_nfa_set() const {
-		return nfa_index;
+		return contain_nfa;
 	}
 	bool is_final() {
 		return final;
 	}
-	void set_final() {
-		final = true;
-	}
-	void set_tran(std::vector<int>::size_type index, int value) {
+	void set_tran(std::vector<dfa_index>::size_type index, int value) {
 		status_tran[index] = value;
 	}
+	dfa_index tran(std::vector<dfa_index>::size_type index) {
+		return status_tran[index];
+	}
+	nfa_index get_index() {
+		return index;
+	}
+	static void reset() {
+		index_count = 0;
+	}
 private:
-	std::vector<int> status_tran;
-	index_set nfa_index;
+	std::vector<dfa_index> status_tran;
+	index_set contain_nfa;
 	bool final = false;
+	dfa_index index;
+	static unsigned int capacity;
+	static dfa_index index_count;
 };
+
 
 
 typedef std::vector<DFAStatus> Dtran;

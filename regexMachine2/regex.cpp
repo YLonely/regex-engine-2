@@ -6,7 +6,7 @@
 
 
 namespace regex_engine2_automata_parse {
-std::tuple<regex_engine2_regex::EdgeSet, regex_engine2_automata::Dtran> automata_parse(std::wstring restring);
+std::tuple<regex_engine2_regex::CharSet, regex_engine2_automata::Dtran> automata_parse(std::wstring restring);
 }
 
 
@@ -37,13 +37,13 @@ bool Regex::match(wstring teststring)
 	return false;
 }
 
-EdgeSet & EdgeSet::add_edge(edge e)
+CharSet & CharSet::add_group(char_group e)
 {
 	if (e_set.empty())
 		e_set.push_back(std::move(e));
 	else
 	{
-		vector<edge> temp;
+		vector<char_group> temp;
 		for (auto &it = e_set.begin(); it != e_set.end(); ++it)
 		{
 			if (e.second < it->first)
@@ -126,11 +126,11 @@ EdgeSet & EdgeSet::add_edge(edge e)
 	return *this;
 }
 
-std::vector<index_t> EdgeSet::get_edge_index(edge e)
+std::vector<group_index> CharSet::get_group_index(char_group e)
 {
-	vector<index_t> temp;
+	vector<group_index> temp;
 	bool state = false;
-	for (index_t i = 0; i < e_set.size(); ++i)
+	for (group_index i = 0; i < e_set.size(); ++i)
 	{
 		if (!state&&e.first == e_set[i].first)
 		{
@@ -156,25 +156,25 @@ std::vector<index_t> EdgeSet::get_edge_index(edge e)
 /*
 	edges must be non-intersect and only be used for SetNode.
 */
-std::vector<index_t> EdgeSet::get_edge_index(std::vector<edge> edges)
+std::vector<group_index> CharSet::get_group_index(std::vector<char_group> edges)
 {
-	vector<index_t> result;
-	vector<index_t> temp;
+	vector<group_index> result;
+	vector<group_index> temp;
 	for (auto &e : edges)
 	{
-		temp = std::move(get_edge_index(e));
+		temp = std::move(get_group_index(e));
 		for (auto &i : temp)
 			result.push_back(i);
 	}
 	return result;
 }
 
-index_t EdgeSet::get_edge_index(wchar_t &ch)
+group_index CharSet::get_group_index(wchar_t &ch)
 {
-	index_t index = e_set.size();
+	group_index index = e_set.size();
 	if (e_set.empty())
 		return index;
-	for (index_t i = 0; i < e_set.size(); ++i)
+	for (group_index i = 0; i < e_set.size(); ++i)
 	{
 		if (ch >= e_set[i].first&&ch <= e_set[i].second)
 		{
@@ -185,7 +185,7 @@ index_t EdgeSet::get_edge_index(wchar_t &ch)
 	return index;
 }
 
-edge EdgeSet::get_edge(index_t index)
+char_group CharSet::get_group(group_index index)
 {
 	if (index >= e_set.size())
 		throw std::runtime_error("Get edge out of range.");

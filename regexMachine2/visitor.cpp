@@ -58,7 +58,7 @@ Automata NFAConstructVisitor::apply(CharNode *n)
 {
 	status_ptr start = make_shared<NFAStatus>(status_index++);
 	status_ptr end = make_shared<NFAStatus>(status_index++);
-	edge_ptr char_edge = make_shared<Edge>(set.get_edge_index({ n->get_char(),n->get_char() }));
+	edge_ptr char_edge = make_shared<Edge>(set.get_group_index({ n->get_char(),n->get_char() }));
 	connect(start, end, char_edge);
 
 	record(start);
@@ -127,7 +127,7 @@ Automata NFAConstructVisitor::apply(SetNode *n)
 {
 	status_ptr start = make_shared<NFAStatus>(status_index++);
 	status_ptr end = make_shared<NFAStatus>(status_index++);
-	edge_ptr char_edge = make_shared<Edge>(set.get_edge_index(n->get_set()));
+	edge_ptr char_edge = make_shared<Edge>(set.get_group_index(n->get_set()));
 	connect(start, end, char_edge);
 
 	record(start);

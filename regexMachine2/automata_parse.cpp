@@ -25,13 +25,14 @@ using regex_engine2_automata::DFAStatus;
 using regex_engine2_automata::index_set;
 using regex_engine2_automata::status_set;
 using regex_engine2_automata::Dtran;
+using regex_engine2_automata::dfa_index;
 
-using regex_engine2_regex::index_t;
-using regex_engine2_regex::EdgeSet;
+using regex_engine2_regex::group_index;
+using regex_engine2_regex::CharSet;
 using regex_engine2_ast::AST;
 
 using regex_engine2_visitor::NFAConstructVisitor;
-using regex_engine2_visitor::EdgeSetConstructVisitor;
+using regex_engine2_visitor::CharSetConstructVisitor;
 
 using regex_engine2_parser::regex_parse;
 
@@ -49,7 +50,7 @@ namespace {
 
 std::vector<status_ptr> all_status;
 
-index_set switch_to_i(status_set s)
+inline index_set switch_to_i(status_set s)
 {
 	index_set set;
 	for (auto &k : s)
@@ -57,15 +58,13 @@ index_set switch_to_i(status_set s)
 	return set;
 }
 
-status_set switch_to_s(index_set i)
+inline status_set switch_to_s(index_set i)
 {
 	status_set set;
 	for (auto &k : i)
 		set.push_back(all_status[k]);
 	return set;
 }
-
-
 
 index_set epsilon_closure(status_ptr s)
 {
@@ -102,18 +101,20 @@ index_set epsilon_closure(index_set s)
 	return set;
 }
 
-index_set move(index_set set, index_t a)
+index_set move(index_set set, group_index a)
 {
 	status_set s_set = switch_to_s(set);
 	index_set s;
+	vector<group_index> content;
 	for (auto &i : s_set)
 	{
 		for (auto &e : i->get_out_edges())
 		{
 			if (e->get_match_content().size())
 			{
-				auto it = std::find(e->get_match_content().begin(), e->get_match_content().end(), a);
-				if (it != e->get_match_content().end())
+				content = e->get_match_content();
+				auto it = std::find(content.begin(), content.end(), a);
+				if (it != content.end())
 					s.insert((e->get_end())->get_index());
 			}
 		}
@@ -122,17 +123,20 @@ index_set move(index_set set, index_t a)
 }
 
 
-void dfa_minimize(Automata &dfa)
+Dtran dfa_minimize(Dtran &tran)
 {
-
+	auto capacity = DFAStatus::get_capacity();
+	
 }
 
-Dtran nfa_to_dfa(Automata &nfa, EdgeSet &set)
+Dtran nfa_to_dfa(Automata &nfa, CharSet &set)
 {
+	DFAStatus::reset();
+	DFAStatus::set_capacity(set.get_max_index());
 	all_status = nfa.all_status;
 	list<DFAStatus> Dstatus;
 	Dtran tran;
-	Dstatus.push_back(DFAStatus(set.get_capacity(), epsilon_closure(nfa.start)));
+	Dstatus.push_back(DFAStatus(epsilon_closure(nfa.start)));
 
 	auto add = [&Dstatus](DFAStatus s)->int {
 		int i = 0;
@@ -148,15 +152,15 @@ Dtran nfa_to_dfa(Automata &nfa, EdgeSet &set)
 	bool final = false;
 	for (auto it = Dstatus.begin(); it != Dstatus.end(); ++it)
 	{
-		for (index_t i = 0; i < set.get_capacity(); ++i)
+		for (group_index i = 0; i < set.get_max_index(); ++i)
 		{
 			auto temp = epsilon_closure(move(it->get_nfa_set(), i));
-			if (temp.size() != 0)
+			if (!temp.empty())
 			{
-				auto itt = find(temp.begin(), temp.end(), nfa.get_final_index());
+				auto itt = temp.find(nfa.get_final_index());
 				if (itt != temp.end())
 					final = true;
-				it->set_tran(i, add(DFAStatus(set.get_capacity(), temp, final)));
+				it->set_tran(i, add(DFAStatus(temp, final)));
 			} else
 				it->set_tran(i, -1);
 		}
@@ -169,7 +173,7 @@ Dtran nfa_to_dfa(Automata &nfa, EdgeSet &set)
 	return tran;
 }
 
-Automata nodes_to_nfa(AST &ast, EdgeSet &set)
+Automata nodes_to_nfa(AST &ast, CharSet &set)
 {
 	NFAConstructVisitor nfa_visitor(set);
 	return nfa_visitor.invoke(ast.get_root());
@@ -178,19 +182,21 @@ Automata nodes_to_nfa(AST &ast, EdgeSet &set)
 }
 
 
-tuple<EdgeSet, Dtran> automata_parse(wstring restring)
+tuple<CharSet, Dtran> automata_parse(wstring restring)
 {
 	AST ast = regex_parse(restring);
-	EdgeSetConstructVisitor e_visitor;
+	CharSetConstructVisitor e_visitor;
 	for (auto &n : *(ast.get_nodes()))
 		n->accept_visitor(&e_visitor);
-	auto set = std::move(e_visitor.get_set());
-	Automata nfa = nodes_to_nfa(ast, set);
+	auto c_set = std::move(e_visitor.get_set());
+	Automata nfa = nodes_to_nfa(ast, c_set);
 
 	ast.release_nodes();//Release the memory of ast nodes.
 
-	auto tran = nfa_to_dfa(nfa, set);
-	return make_tuple(set, tran);
+	auto tran = nfa_to_dfa(nfa, c_set);
+
+
+	return std::make_tuple(c_set, Dtran());
 }
 
 

@@ -7,7 +7,7 @@
 
 namespace regex_engine2_visitor {
 
-using  regex_engine2_regex::EdgeSet;
+using  regex_engine2_regex::CharSet;
 using namespace regex_engine2_ast;
 
 using regex_engine2_automata::NFAStatus;
@@ -32,16 +32,16 @@ public:
 	virtual void visit(EndOfString*) = 0;
 };
 
-class EdgeSetConstructVisitor :public IVisitor
+class CharSetConstructVisitor :public IVisitor
 {
 public:
 	void visit(CharNode *n) override {
-		set.add_edge({ n->get_char(),n->get_char() });
+		set.add_group({ n->get_char(),n->get_char() });
 	}
 	void visit(SetNode *n) override {
 		auto &set = n->get_set();
 		for (auto &i : set)
-			this->set.add_edge(i);
+			this->set.add_group(i);
 	}
 
 	void visit(RangeNode*) override {}
@@ -53,18 +53,18 @@ public:
 	void visit(EndOfString*) override {}
 
 
-	inline EdgeSet get_set() {
+	inline CharSet get_set() {
 		return set;
 	}
 private:
-	EdgeSet set;
+	CharSet set;
 };
 
 class NFAConstructVisitor :public IVisitor
 {
 public:
 	NFAConstructVisitor() = delete;
-	NFAConstructVisitor(EdgeSet e) :set(std::move(e)) {}
+	NFAConstructVisitor(CharSet e) :set(std::move(e)) {}
 
 	Automata invoke(node_ptr n) {
 		n->accept_visitor(this);
@@ -113,7 +113,7 @@ private:
 	void connect(status_ptr &, status_ptr &, edge_ptr);
 	Automata connect(Automata &, Automata &);
 	int status_index = 0;
-	EdgeSet set;
+	CharSet set;
 	Automata NFA;
 };
 
