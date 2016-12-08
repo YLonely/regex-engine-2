@@ -6,6 +6,7 @@
 #include <set>
 #include <list>
 #include <tuple>
+#include <map>
 
 
 namespace regex_engine2_parser {
@@ -41,6 +42,7 @@ using regex_engine2_parser::regex_parse;
 using std::vector;
 using std::set;
 using std::list;
+using std::map;
 using std::tuple;
 using std::wstring;
 
@@ -127,7 +129,7 @@ index_set move(index_set &set, group_index a)
 }
 
 
-void dfa_minimize(list<DFAStatus> &tran)
+Dtran dfa_minimize(list<DFAStatus> &tran)
 {
 	auto capacity = DFAStatus::get_capacity();
 	list<DFAStatus*> final_status, non_final_status;
@@ -232,8 +234,28 @@ void dfa_minimize(list<DFAStatus> &tran)
 			break;
 	}
 
+	Dtran mini_tran;
+	map<dfa_index, dfa_index> new_dtrans;
+	new_dtrans[-1] = -1;
+	dfa_index new_index = 0;
+	for (auto &set_t : set_group)
+	{
+		for (auto &dfa : set_t)
+		{
+			new_dtrans[dfa->get_index()] = new_index;
+		}
+		++new_index;
+	}
 
+	for (auto &set : set_group)
+	{
+		auto temp_s = set.begin();
+		for (unsigned int i = 0; i < capacity; ++i)
+			(*temp_s)->set_tran(i, new_dtrans[(*temp_s)->tran(i)]);
+		mini_tran.push_back(*(*temp_s));
+	}
 
+	return mini_tran;
 }
 
 list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
@@ -282,10 +304,6 @@ list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
 		}
 	}
 
-	/*for (auto &dfa : Dstatus)
-		tran.push_back(dfa);
-
-	all_status.clear();*/
 	return Dstatus;
 }
 
@@ -309,11 +327,11 @@ tuple<CharSet, Dtran> automata_parse(wstring restring)
 
 	ast.release_nodes();//Release the memory of ast nodes.
 
-	auto tran = nfa_to_dfa(nfa, c_set);
+	auto dtran = nfa_to_dfa(nfa, c_set);
 
-	dfa_minimize(tran);
+	auto mini_dtran = dfa_minimize(dtran);
 
-	return std::make_tuple(c_set, Dtran());
+	return std::make_tuple(c_set, mini_dtran);
 }
 
 
