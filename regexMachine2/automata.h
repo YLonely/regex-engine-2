@@ -107,7 +107,7 @@ public:
 	dfa_index tran(std::vector<dfa_index>::size_type index) {
 		return status_tran[index];
 	}
-	nfa_index get_index() {
+	dfa_index get_index() {
 		return index;
 	}
 	static void reset() {

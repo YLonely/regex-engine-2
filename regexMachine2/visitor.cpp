@@ -110,14 +110,17 @@ Automata NFAConstructVisitor::apply(RangeNode *n)
 			auto frag = invoke(n->get_node());
 			head = connect(head, frag);
 		}
-		status_ptr end = make_shared<NFAStatus>(status_index++);
-		record(end);
+		std::vector<status_ptr> frag_starts;
 		for (int i = 0; i < max - min; ++i)
 		{
 			auto frag = invoke(n->get_node());
-			connect(frag.start, end);
+			frag_starts.push_back(frag.start);
 			head = connect(head, frag);
 		}
+		status_ptr end = make_shared<NFAStatus>(status_index++);
+		record(end);
+		for (auto &it : frag_starts)
+			connect(it, end);
 		return connect(head, end);
 	}
 
