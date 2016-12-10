@@ -56,8 +56,8 @@ Automata regex_engine2_visitor::NFAConstructVisitor::connect(Automata &start, Au
 
 Automata NFAConstructVisitor::apply(CharNode *n)
 {
-	status_ptr start = make_shared<NFAStatus>(status_index++);
-	status_ptr end = make_shared<NFAStatus>(status_index++);
+	status_ptr start = make_shared<NFAStatus>();
+	status_ptr end = make_shared<NFAStatus>();
 	edge_ptr char_edge = make_shared<Edge>(set.get_group_index({ n->get_char(),n->get_char() }));
 	connect(start, end, char_edge);
 
@@ -80,10 +80,10 @@ Automata NFAConstructVisitor::apply(RangeNode *n)
 	int min = n->get_range().first, max = n->get_range().second;
 	if (min == 0 && max == -1)
 	{
-		auto start = make_shared<NFAStatus>(status_index++);
+		auto start = make_shared<NFAStatus>();
 		record(start);
 		auto frag = invoke(n->get_node());
-		auto end = make_shared<NFAStatus>(status_index++);
+		auto end = make_shared<NFAStatus>();
 		connect(frag.end, frag.start);
 		connect(frag.end, end);
 
@@ -117,7 +117,7 @@ Automata NFAConstructVisitor::apply(RangeNode *n)
 			frag_starts.push_back(frag.start);
 			head = connect(head, frag);
 		}
-		status_ptr end = make_shared<NFAStatus>(status_index++);
+		status_ptr end = make_shared<NFAStatus>();
 		record(end);
 		for (auto &it : frag_starts)
 			connect(it, end);
@@ -128,8 +128,8 @@ Automata NFAConstructVisitor::apply(RangeNode *n)
 
 Automata NFAConstructVisitor::apply(SetNode *n)
 {
-	status_ptr start = make_shared<NFAStatus>(status_index++);
-	status_ptr end = make_shared<NFAStatus>(status_index++);
+	status_ptr start = make_shared<NFAStatus>();
+	status_ptr end = make_shared<NFAStatus>();
 	edge_ptr char_edge = make_shared<Edge>(set.get_group_index(n->get_set()));
 	connect(start, end, char_edge);
 
@@ -141,13 +141,13 @@ Automata NFAConstructVisitor::apply(SetNode *n)
 
 Automata NFAConstructVisitor::apply(AlternationNode *n)
 {
-	auto alter_status = make_shared<NFAStatus>(status_index++);
+	auto alter_status = make_shared<NFAStatus>();
 
 	record(alter_status);
 
 	Automata left = invoke(n->get_left());
 	Automata right = invoke(n->get_right());
-	auto end_status = make_shared<NFAStatus>(status_index++);
+	auto end_status = make_shared<NFAStatus>();
 	connect(alter_status, left.start);
 	connect(alter_status, right.start);
 
@@ -163,10 +163,10 @@ Automata NFAConstructVisitor::apply(AlternationNode *n)
 
 Automata NFAConstructVisitor::apply(StarNode *n)
 {
-	auto start = make_shared<NFAStatus>(status_index++);
+	auto start = make_shared<NFAStatus>();
 	record(start);
 	auto frag = invoke(n->get_node());
-	auto end = make_shared<NFAStatus>(status_index++);
+	auto end = make_shared<NFAStatus>();
 	connect(frag.end, frag.start);
 	connect(frag.end, end);
 
@@ -193,6 +193,7 @@ Automata NFAConstructVisitor::apply(QuesNode *n)
 
 Automata NFAConstructVisitor::apply(EndOfString *end)
 {
+	NFAStatus::reset();
 	Automata nfa = invoke(end->get_node());
 	nfa.end->final = true;
 	nfa.all_edges = std::move(all_edges);

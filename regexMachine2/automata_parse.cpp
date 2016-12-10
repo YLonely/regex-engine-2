@@ -131,7 +131,7 @@ index_set move(index_set &set, group_index a)
 
 Dtran dfa_minimize(list<DFAStatus> &tran)
 {
-	auto capacity = DFAStatus::get_capacity();
+	auto capacity = DFAStatus::size();
 	list<DFAStatus*> final_status, non_final_status;
 	for (auto &status : tran)
 	{
@@ -198,12 +198,12 @@ Dtran dfa_minimize(list<DFAStatus> &tran)
 			first_dfa = *(it1->begin());
 			for (unsigned int i = 0; i < capacity; ++i)
 			{
-				target_set = find_target(first_dfa->tran(i));
+				target_set = find_target((*first_dfa)[i]);
 				auto it2 = it1->begin();
 				it2++;
 				for (; it2 != it1->end(); ++it2)
 				{
-					if (!in_same_set((*it2)->tran(i)))
+					if (!in_same_set((*(*it2))[i]))
 					{
 						if (!dfa_to_delete.empty())
 						{
@@ -251,7 +251,7 @@ Dtran dfa_minimize(list<DFAStatus> &tran)
 	{
 		auto temp_s = set.begin();
 		for (unsigned int i = 0; i < capacity; ++i)
-			(*temp_s)->set_tran(i, new_dtrans[(*temp_s)->tran(i)]);
+			(*(*temp_s))[i] = new_dtrans[(*(*temp_s))[i]];
 		mini_tran.push_back(*(*temp_s));
 	}
 
@@ -261,7 +261,7 @@ Dtran dfa_minimize(list<DFAStatus> &tran)
 list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
 {
 	DFAStatus::reset();
-	DFAStatus::set_capacity(char_set.get_max_index());
+	DFAStatus::set_size(char_set.size());
 	all_status = nfa.all_status;
 	list<DFAStatus> Dstatus;
 	//Dtran tran;
@@ -290,7 +290,7 @@ list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
 	set<nfa_index>::iterator itt;
 	for (auto it = Dstatus.begin(); it != Dstatus.end(); ++it)
 	{
-		for (group_index i = 0; i < char_set.get_max_index(); ++i)
+		for (group_index i = 0; i < char_set.size(); ++i)
 		{
 			temp2 = epsilon_closure(move(it->get_nfa_set(), i));
 			if (!temp2.empty())
@@ -298,12 +298,13 @@ list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
 				itt = temp2.find(nfa.get_final_index());
 				if (itt != temp2.end())
 					final = true;
-				it->set_tran(i, add(temp2, final));
+				//it->set_tran(i, add(temp2, final));
+				(*it)[i] = add(temp2, final);
 				final = false;
 			}
 		}
 	}
-
+	all_status.clear();
 	return Dstatus;
 }
 
@@ -324,11 +325,8 @@ tuple<CharSet, Dtran> automata_parse(wstring restring)
 		n->accept_visitor(&e_visitor);
 	auto c_set = std::move(e_visitor.get_set());
 	Automata nfa = nodes_to_nfa(ast, c_set);
-
-	ast.release_nodes();//Release the memory of ast nodes.
-
 	auto dtran = nfa_to_dfa(nfa, c_set);
-
+	nfa.free();
 	auto mini_dtran = dfa_minimize(dtran);
 
 	return std::make_tuple(c_set, mini_dtran);

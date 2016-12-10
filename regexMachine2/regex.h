@@ -19,7 +19,7 @@ public:
 	std::vector<group_index> get_group_index(std::vector<char_group>);
 	group_index get_group_index(wchar_t &);
 	char_group get_group(group_index index);
-	inline auto get_max_index() {
+	inline auto size() {
 		return (group_index)e_set.size();
 	}
 private:

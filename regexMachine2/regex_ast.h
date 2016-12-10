@@ -34,9 +34,6 @@ public:
 	inline node_ptr get_root() {
 		return nodes->back();
 	}
-	void release_nodes() {
-		nodes = nullptr;
-	}
 private:
 	std::unique_ptr<std::vector<node_ptr>> nodes;
 };

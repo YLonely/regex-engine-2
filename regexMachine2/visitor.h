@@ -7,7 +7,7 @@
 
 namespace regex_engine2_visitor {
 
-using  regex_engine2_regex::CharSet;
+using regex_engine2_regex::CharSet;
 using namespace regex_engine2_ast;
 
 using regex_engine2_automata::NFAStatus;
@@ -112,7 +112,6 @@ private:
 	Automata connect(Automata &, status_ptr &);
 	void connect(status_ptr &, status_ptr &, edge_ptr);
 	Automata connect(Automata &, Automata &);
-	int status_index = 0;
 	CharSet set;
 	Automata NFA;
 };

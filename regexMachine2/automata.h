@@ -15,6 +15,7 @@ using regex_engine2_regex::group_index;
 
 
 class Edge;
+class Automata;
 typedef std::shared_ptr<Edge> edge_ptr;
 typedef int nfa_index;
 typedef int dfa_index;
@@ -23,27 +24,35 @@ class NFAStatus
 {
 	friend class regex_engine2_visitor::NFAConstructVisitor;
 	friend class Edge;
+	friend class Automata;
 public:
-	NFAStatus() = default;
-	NFAStatus(int index, bool final = false) :index(index), final(final) {}
-	auto get_in_edges() {
+	NFAStatus(bool final = false) :final(final) {
+		index = index_count++;
+	}
+	inline auto get_in_edges() {
 		return in_edges;
 	}
-	auto get_out_edges() {
+	inline auto get_out_edges() {
 		return out_edges;
 	}
-	bool is_final() {
+	inline bool is_final() {
 		return final;
 	}
-	int get_index() {
+	inline int get_index() {
 		return index;
+	}
+	static void reset() {
+		index_count = 0;
+	}
+	~NFAStatus() {
+		std::cout << "Status:shit" << std::endl;
 	}
 private:
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
 	bool final = false;
-	nfa_index index = -1;
-
+	nfa_index index;
+	static nfa_index index_count;
 };
 
 typedef std::shared_ptr<NFAStatus> status_ptr;
@@ -51,6 +60,7 @@ typedef std::shared_ptr<NFAStatus> status_ptr;
 class Edge
 {
 	friend class regex_engine2_visitor::NFAConstructVisitor;
+	friend class Automata;
 public:
 	Edge() = default;
 	Edge(std::vector<group_index> content) :match_content(std::move(content)) {}
@@ -62,6 +72,9 @@ public:
 	}
 	auto get_end() {
 		return end;
+	}
+	~Edge() {
+		std::cout << "Edge:shit" << std::endl;
 	}
 private:
 	std::vector<group_index> match_content;
@@ -81,16 +94,16 @@ public:
 	DFAStatus() = default;
 	DFAStatus(index_set s, bool final = false) :
 		contain_nfa(std::move(s)), final(final) {
-		if (capacity == 0)
+		if (char_group_size == 0)
 			throw std::runtime_error("DFAStatus:capacity==0");
-		status_tran = std::vector<dfa_index>(capacity, -1);
+		status_tran = std::vector<dfa_index>(char_group_size, -1);
 		index = index_count++;
 	}
-	static unsigned int get_capacity() {
-		return capacity;
+	static unsigned int size() {
+		return char_group_size;
 	}
-	static void set_capacity(unsigned int c) {
-		capacity = c;
+	static void set_size(unsigned int c) {
+		char_group_size = c;
 	}
 	void set_nfa_set(index_set set) {
 		contain_nfa = std::move(set);
@@ -101,11 +114,11 @@ public:
 	bool is_final() {
 		return final;
 	}
-	void set_tran(std::vector<dfa_index>::size_type index, int value) {
-		status_tran[index] = value;
+	dfa_index& operator[](std::vector<dfa_index>::size_type n) {
+		return status_tran[n];
 	}
-	dfa_index tran(std::vector<dfa_index>::size_type index) {
-		return status_tran[index];
+	const dfa_index& operator[](std::vector<dfa_index>::size_type n)const {
+		return status_tran[n];
 	}
 	dfa_index get_index() {
 		return index;
@@ -118,7 +131,7 @@ private:
 	index_set contain_nfa;
 	bool final = false;
 	dfa_index index;
-	static unsigned int capacity;
+	static unsigned int char_group_size;
 	static dfa_index index_count;
 };
 
@@ -136,8 +149,22 @@ public:
 	int get_final_index() {
 		return end->get_index();
 	}
-
-
+	void free() {
+		for (auto &edge : all_edges)
+		{
+			edge->start.reset();
+			edge->end.reset();
+		}
+		for (auto &s : all_status)
+		{
+			s->in_edges.clear();
+			s->out_edges.clear();
+		}
+		start.reset();
+		end.reset();
+		all_edges.clear();
+		all_status.clear();
+	}
 	std::vector<edge_ptr> all_edges;
 	std::vector<status_ptr> all_status;
 	status_ptr start;

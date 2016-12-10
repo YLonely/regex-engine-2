@@ -12,8 +12,8 @@ int main()
 	//Regex b(L"[^a-m]");
 	try
 	{
-		Regex a(L"(abb){1,5}");
 		//Regex a(L"(a|b)*abb");
+		//Regex b(L"(a|b)*abb{23,45}");
 	}
 	catch (const std::exception& e)
 	{
