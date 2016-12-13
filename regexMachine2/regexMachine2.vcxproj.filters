@@ -36,6 +36,9 @@
     <ClInclude Include="regex_ast.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="regex_exception.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +63,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="automata_parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="regex_exception.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

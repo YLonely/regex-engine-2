@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "regex_ast.h"
+#include "regex_exception.h"
 
 /*
 	The parser for regex.Transform the regex into ast.
@@ -41,6 +42,7 @@ using std::runtime_error;
 
 using std::make_shared;
 using std::make_pair;
+using regex_engine2_exception::arguement_error;
 
 using namespace regex_engine2_ast;
 
@@ -379,16 +381,16 @@ node_ptr basic_re()
 	if (match('{'))
 	{
 		if (!ele)
-			throw runtime_error("Missing argument before '{' '}'");
+			throw runtime_error("Missing arguement before '{' '}'");
 		if (match('}'))
-			throw runtime_error("Missing argument in '{' '}'");
+			throw arguement_error("Missing arguement in {min,max}", regex, index);
 		pair<int, int> p = range();
 		temp = make_shared<RangeNode>(ele, p.first, p.second);
 		nodes->push_back(temp);
 	} else if (match('*'))
 	{
 		if (!ele)
-			throw runtime_error("Missing argument before '*'");
+			throw runtime_error("Missing arguement before '*'");
 		temp = make_shared<StarNode>(ele);
 		nodes->push_back(temp);
 	} else if (match('+'))
