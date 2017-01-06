@@ -1,12 +1,15 @@
 #pragma once
+#include <vector>
+#include "automata.h"
 
 namespace regex_engine2_regex {
 
 
-typedef std::pair<wchar_t, wchar_t> char_group;
-typedef std::vector<char_group>::size_type group_index;
+using regex_engine2_automata::char_group;
+using regex_engine2_automata::group_index;
+using regex_engine2_automata::Dtran;
 
-
+using regex_engine2_automata::Dtran;
 /*
 	The class which stores the char range of the regex,
 	and devide the range into non-intersect range set.
@@ -48,6 +51,7 @@ private:
 	std::wstring regex;
 	std::wstring result;
 	CharSet set;
+	Dtran tran;
 };
 
 }

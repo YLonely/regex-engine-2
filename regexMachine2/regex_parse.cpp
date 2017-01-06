@@ -38,11 +38,11 @@ using std::pair;
 using std::vector;
 using std::wstring;
 using std::shared_ptr;
-using std::runtime_error;
 
 using std::make_shared;
 using std::make_pair;
 using regex_engine2_exception::arguement_error;
+using regex_engine2_exception::syntax_error;
 
 using namespace regex_engine2_ast;
 
@@ -153,12 +153,12 @@ void set_item(shared_ptr<SetNode> &set)
 		if (match('-'))
 		{
 			if (setchar)
-				throw runtime_error("Wrong argument in \"[a-b]\"");
+				throw arguement_error(L"Wrong argument in \"[a-b]\"", regex, index);
 			if (regex[index] == '\\')
 			{
 				c2 = regex[++index];
 				if (c2 == 'd' || c2 == 'D' || c2 == 's' || c2 == 'S' || c2 == 'w' || c2 == 'W')
-					throw runtime_error("Wrong argument in \"[a-b]\"");
+					throw arguement_error(L"Wrong argument in \"[a-b]\"", regex, index);
 				switch (c2)
 				{
 				case 't':
@@ -179,7 +179,7 @@ void set_item(shared_ptr<SetNode> &set)
 			} else
 				c2 = regex[index];
 			if (c1 >= c2)
-				throw runtime_error("Wrong argument in \"[a-b]\"");
+				throw arguement_error(L"Wrong argument in \"[a-b]\"", regex, index);
 			else
 				set->add_set_range(c1, c2);
 			++index;
@@ -291,12 +291,12 @@ node_ptr elementary_re()
 	if (match('('))
 	{
 		if (match(')'))
-			throw runtime_error("Missing argument in '(' ')'");
+			throw arguement_error(L"Missing argument in '(' ')'", regex, index);
 		else
 		{
 			node = regular_expression();
 			if (!match(')'))
-				throw runtime_error("Syntax error:missing ')'");
+				throw syntax_error(L"Missing ')'", regex, index);
 		}
 	} else if (match('\\'))
 	{
@@ -310,7 +310,7 @@ node_ptr elementary_re()
 	} else if (match('['))
 	{
 		if (match(']'))
-			throw runtime_error("Missing argument in '[' ']'");
+			throw arguement_error(L"Missing argument in '[' ']'", regex, index);
 		shared_ptr<SetNode> set_n;
 		if (match('^'))
 		{
@@ -322,7 +322,7 @@ node_ptr elementary_re()
 			set_item(set_n);
 		}
 		if (!match(']'))
-			throw runtime_error("Syntax error:missing ']'");
+			throw syntax_error(L"Missing ']'", regex, index);
 		node = set_n;
 		set_n->merge();
 		nodes->push_back(node);
@@ -343,7 +343,7 @@ pair<int, int> range()
 	if (isdigit(regex[index]))
 		num1 = regex[index++] - '0';
 	else
-		throw runtime_error("Missing argument next to the '{'.");
+		throw arguement_error(L"Missing argument next to the '{'.", regex, index);
 	while (isdigit(regex[index]))
 	{
 		num1 = num1 * 10 + regex[index] - '0';
@@ -364,13 +364,13 @@ pair<int, int> range()
 		}
 		if (match('}'))
 			if (num1 >= num2&&num2 != -1)
-				throw runtime_error("In the operation \"{num1,num2}\",num1 must be smaller than num2.");
+				throw arguement_error(L"In the operation \"{num1,num2}\",num1 must be smaller than num2.", regex, index);
 			else
 				return make_pair(num1, num2);
 		else
-			throw runtime_error("Syntax error:missing '}'.");
+			throw syntax_error(L"Missing '}'.", regex, index);
 	} else
-		throw runtime_error("Syntax error:wrong symbol in the operation \"{num1,num2}\".");
+		throw syntax_error(L"Wrong symbol in the operation \"{num1,num2}\".", regex, index);
 }
 
 
@@ -381,28 +381,28 @@ node_ptr basic_re()
 	if (match('{'))
 	{
 		if (!ele)
-			throw runtime_error("Missing arguement before '{' '}'");
+			throw arguement_error(L"Missing arguement before '{' '}'", regex, index);
 		if (match('}'))
-			throw arguement_error("Missing arguement in {min,max}", regex, index);
+			throw arguement_error(L"Missing arguement in {min,max}", regex, index);
 		pair<int, int> p = range();
 		temp = make_shared<RangeNode>(ele, p.first, p.second);
 		nodes->push_back(temp);
 	} else if (match('*'))
 	{
 		if (!ele)
-			throw runtime_error("Missing arguement before '*'");
+			throw arguement_error(L"Missing arguement before '*'", regex, index);
 		temp = make_shared<StarNode>(ele);
 		nodes->push_back(temp);
 	} else if (match('+'))
 	{
 		if (!ele)
-			throw runtime_error("Missing argument before '+'");
+			throw arguement_error(L"Missing argument before '+'", regex, index);
 		temp = make_shared<PlusNode>(ele);
 		nodes->push_back(temp);
 	} else if (match('?'))
 	{
 		if (!ele)
-			throw runtime_error("Missing argument before '?'");
+			throw arguement_error(L"Missing argument before '?'", regex, index);
 		temp = make_shared<QuesNode>(ele);
 		nodes->push_back(temp);
 	} else

@@ -2,6 +2,7 @@
 #include "regex.h"
 #include "visitor.h"
 #include "automata.h"
+#include "regex_exception.h"
 #include <tuple>
 
 
@@ -18,7 +19,9 @@ using std::wstring;
 using std::pair;
 using std::make_pair;
 using std::tuple;
+using regex_engine2_exception::regex_runtime_error;
 using regex_engine2_automata_parse::automata_parse;
+
 
 void parse(Regex &re)
 {
@@ -188,7 +191,7 @@ group_index CharSet::get_group_index(wchar_t &ch)
 char_group CharSet::get_group(group_index index)
 {
 	if (index >= e_set.size())
-		throw std::runtime_error("Get edge out of range.");
+		throw regex_runtime_error(L"Get edge out of range.");
 	return e_set[index];
 }
 

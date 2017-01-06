@@ -13,7 +13,6 @@
 #include <vector>
 #include <utility>
 #include <memory>
-#include <stdexcept>
 #include <cctype>
 #include <stdlib.h>
 #include <cassert>

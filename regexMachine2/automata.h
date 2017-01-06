@@ -3,7 +3,7 @@
 #include <memory>
 #include <set>
 #include <list>
-#include "regex.h"
+#include "regex_exception.h"
 namespace regex_engine2_visitor {
 class NFAConstructVisitor;
 }
@@ -11,8 +11,9 @@ class NFAConstructVisitor;
 
 namespace regex_engine2_automata {
 
-using regex_engine2_regex::group_index;
-
+typedef std::pair<wchar_t, wchar_t> char_group;
+typedef std::vector<char_group>::size_type group_index;
+using regex_engine2_exception::regex_runtime_error;
 
 class Edge;
 class Automata;
@@ -44,9 +45,9 @@ public:
 	static void reset() {
 		index_count = 0;
 	}
-	~NFAStatus() {
+	/*~NFAStatus() {
 		std::cout << "Status:shit" << std::endl;
-	}
+	}*/
 private:
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
@@ -73,9 +74,9 @@ public:
 	auto get_end() {
 		return end;
 	}
-	~Edge() {
+	/*~Edge() {
 		std::cout << "Edge:shit" << std::endl;
-	}
+	}*/
 private:
 	std::vector<group_index> match_content;
 	status_ptr start;
@@ -95,7 +96,7 @@ public:
 	DFAStatus(index_set s, bool final = false) :
 		contain_nfa(std::move(s)), final(final) {
 		if (char_group_size == 0)
-			throw std::runtime_error("DFAStatus:capacity==0");
+			throw regex_runtime_error(L"DFAStatus:capacity==0");
 		status_tran = std::vector<dfa_index>(char_group_size, -1);
 		index = index_count++;
 	}
