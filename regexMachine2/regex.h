@@ -1,8 +1,16 @@
 #pragma once
 #include <vector>
 #include "automata.h"
+#include "regex_exception.h"
+using regex_engine2_exception::engine_exception;
 
 namespace regex_engine2_regex {
+
+enum MATCH_TYPE
+{
+	SUB_MATCH,
+	ALL_MATCH
+};
 
 
 using regex_engine2_automata::char_group;
@@ -33,6 +41,7 @@ private:
 class Regex
 {
 	friend void parse(Regex &);
+	friend int regex_match(std::wstring&, unsigned int, Regex &);
 public:
 	Regex() = default;
 	Regex(std::wstring re) {
@@ -40,8 +49,8 @@ public:
 	}
 	void set_regex(std::wstring re);
 
-	bool match(std::wstring teststring);
-	inline std::wstring &get_result() {
+	bool match(std::wstring teststring, MATCH_TYPE);
+	inline auto &get_result() {
 		return result;
 	}
 	std::wstring get_regex() {
@@ -49,7 +58,9 @@ public:
 	}
 private:
 	std::wstring regex;
-	std::wstring result;
+	//std::wstring result;
+	//Record the match result of SUB_MATCH
+	std::vector<std::pair<unsigned int, std::wstring>> result;
 	CharSet set;
 	Dtran tran;
 };

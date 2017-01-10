@@ -143,6 +143,8 @@ Dtran dfa_minimize(list<DFAStatus> &tran)
 	list<list<DFAStatus*>> set_group;
 	if (non_final_status.empty())
 		set_group = { final_status };
+	else if(tran.front().is_final())
+		set_group = { final_status,non_final_status };
 	else
 		set_group = { non_final_status,final_status };
 	list<DFAStatus*> *target_set = nullptr;

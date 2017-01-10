@@ -3,19 +3,19 @@
 
 #include "stdafx.h"
 #include "regex.h"
-#include "regex_exception.h"
 using regex_engine2_regex::Regex;
-using regex_engine2_exception::engine_exception;
+using regex_engine2_regex::MATCH_TYPE;
 int main()
 {
 	//Regex a(L"[^a]");
 	//Regex b(L"[^a-m]");
 	try
 	{
-		Regex a(L"(a|b)*abb");
+		Regex a(L"(abcd|(abb)*ab){2,79}");
 		//Regex b(L"(a|b)*abb{23,45}");
 		//std::cout << "123\n \030" << std::endl;
-	
+		if (a.match(L"abcdabbab", MATCH_TYPE::SUB_MATCH))
+			std::cout << "true" << std::endl;
 
 		/*wchar_t m = L'Äã';
 		std::wcout.imbue(std::locale("chs"));

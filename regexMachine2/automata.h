@@ -109,16 +109,20 @@ public:
 	void set_nfa_set(index_set set) {
 		contain_nfa = std::move(set);
 	}
-	auto get_nfa_set() const {
+	auto& get_nfa_set(){
 		return contain_nfa;
 	}
 	bool is_final() {
 		return final;
 	}
 	dfa_index& operator[](std::vector<dfa_index>::size_type n) {
+		if (n >= status_tran.size())
+			return INDEX_ERROR;
 		return status_tran[n];
 	}
 	const dfa_index& operator[](std::vector<dfa_index>::size_type n)const {
+		if (n >= status_tran.size())
+			return INDEX_ERROR;
 		return status_tran[n];
 	}
 	dfa_index get_index() {
@@ -134,6 +138,7 @@ private:
 	dfa_index index;
 	static unsigned int char_group_size;
 	static dfa_index index_count;
+	static int INDEX_ERROR;
 };
 
 

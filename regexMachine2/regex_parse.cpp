@@ -331,6 +331,7 @@ node_ptr elementary_re()
 		auto n = make_shared<SetNode>(true);
 		n->add_set_range((wchar_t)0, (wchar_t)65535);
 		nodes->push_back(n);
+		node = n;
 	} else
 		_char(node);
 

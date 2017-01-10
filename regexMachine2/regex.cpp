@@ -21,23 +21,75 @@ using std::make_pair;
 using std::tuple;
 using regex_engine2_exception::regex_runtime_error;
 using regex_engine2_automata_parse::automata_parse;
+using regex_engine2_automata::dfa_index;
 
-
+int regex_match(wstring &test, unsigned int ppos, Regex &re);
 void parse(Regex &re)
 {
 	auto result = automata_parse(re.regex);
 	re.set = std::move(std::get<0>(result));
+	re.tran = std::move(std::get<1>(result));
 }
 
 void Regex::set_regex(wstring re)
 {
-	regex = std::move(re);
-	parse(*this);
+	if (regex != re)
+	{
+		result.clear();
+		regex = std::move(re);
+		parse(*this);
+	}
 }
 
-bool Regex::match(wstring teststring)
+bool Regex::match(wstring teststring, MATCH_TYPE type)
 {
-	return false;
+	int matched_pos;
+	if (type == ALL_MATCH)
+	{
+		matched_pos = regex_match(teststring, 0, *this);
+		if (matched_pos == teststring.length())
+			return true;
+		else
+			return false;
+	}
+
+	for (unsigned int i = 0; i < teststring.length(); ++i)
+	{
+		matched_pos = regex_match(teststring, i, *this);
+		if (matched_pos == -1)
+			continue;
+		result.push_back({ i,wstring(teststring,i,matched_pos - i) });
+		i = matched_pos - 1;
+	}
+
+	if (result.empty())
+		return false;
+	return true;
+}
+
+int regex_match(wstring &test, unsigned int begin_pos, Regex &re)
+{
+	auto pos = begin_pos;
+	int matched_pos = -1;
+	assert(re.tran.size() >= 1);
+	assert(pos <= test.length());
+	dfa_index current_status = (dfa_index)0;
+	if (re.tran[current_status].is_final() && begin_pos == 0)
+		matched_pos = pos;
+	if (!test.empty())
+	{
+		dfa_index next_status = re.tran[current_status][re.set.get_group_index(test[pos++])];
+		while (next_status != -1 && pos < test.length())
+		{
+			if (re.tran[next_status].is_final())
+				matched_pos = pos;
+			current_status = next_status;
+			next_status = re.tran[current_status][re.set.get_group_index(test[pos++])];
+		}
+		if (next_status != -1 && re.tran[next_status].is_final())
+			matched_pos = pos;
+	}
+	return matched_pos;
 }
 
 CharSet & CharSet::add_group(char_group e)
