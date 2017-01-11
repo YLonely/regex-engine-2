@@ -4,6 +4,10 @@
 #include "regex_exception.h"
 using regex_engine2_exception::engine_exception;
 
+namespace regex_engine2_analyzer {
+class LexicalAnalyzer;
+}
+
 namespace regex_engine2_regex {
 
 enum MATCH_TYPE
@@ -42,6 +46,7 @@ class Regex
 {
 	friend void parse(Regex &);
 	friend int regex_match(std::wstring&, unsigned int, Regex &);
+	friend class regex_engine2_analyzer::LexicalAnalyzer;
 public:
 	Regex() = default;
 	Regex(std::wstring re) {
