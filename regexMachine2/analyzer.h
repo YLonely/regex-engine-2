@@ -19,9 +19,13 @@ public:
 		token_name = name;
 		regex = re;
 	}
+	MatchUnit(std::wstring name, std::wstring re_exp) :token_name(std::move(name)) {
+		regex.set_regex(re_exp);
+	}
 private:
 	std::wstring token_name;
 	Regex regex;
+	int unit_id = -1;
 };
 
 
@@ -30,14 +34,16 @@ class LexicalAnalyzer
 public:
 	LexicalAnalyzer() = delete;
 	template<typename T> void add_token(T& head) {
-		token_list.push_back(head);
+		unit_list.push_back(head);
+		for (auto i = 0; i < unit_list.size(); ++i)
+			unit_list[i].unit_id = i;
 	}
 	template<typename T, typename... Args> void add_token(T& head, Args&... rest) {
-		token_list.push_back(head);
+		unit_list.push_back(head);
 		add_token(rest...);
 	}
 	template<typename T, typename... Args> LexicalAnalyzer(T& head, Args&... rest) {
-		token_list.push_back(head);
+		unit_list.push_back(head);
 		add_token(rest...);
 	}
 	//This function return a pair,the first part of the pair is token's name,and the second part
@@ -58,7 +64,7 @@ public:
 			in_stream.close();
 	}
 private:
-	std::vector<MatchUnit> token_list;
+	std::vector<MatchUnit> unit_list;
 	std::wifstream in_stream;
 	bool delay = false;
 	wchar_t in_char;
