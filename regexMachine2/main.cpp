@@ -17,10 +17,10 @@ int main()
 	try
 	{
 		//Regex a(L"[0-9]+");
-		Regex b(L"[a-zA-Z]+");
-		Regex c(L"[^0-9a-zA-Z]+");
-		MatchUnit num(L"num", L"[0-9]+"), ch(L"char", b), other(L"other", c);
-		LexicalAnalyzer an(num, ch, other);
+		/*Regex b(L"[a-zA-Z]+");
+		Regex c(L"[^0-9a-zA-Z]+");*/
+		MatchUnit num(L"num", L".+");
+		LexicalAnalyzer an(num);
 		an.set_target_file(L"D:\\Personal\\Desktop\\test1.txt");
 		token temp = an.get_next_token();
 		while (!temp.first.empty())

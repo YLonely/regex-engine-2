@@ -63,7 +63,6 @@ public:
 	}
 private:
 	std::wstring regex;
-	//std::wstring result;
 	//Record the match result of SUB_MATCH
 	std::vector<std::pair<unsigned int, std::wstring>> result;
 	CharSet set;

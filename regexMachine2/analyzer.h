@@ -42,6 +42,9 @@ public:
 		unit_list.push_back(head);
 		add_token(rest...);
 	}
+	template<typename T> LexicalAnalyzer(T& head) {
+		unit_list.push_back(head);
+	}
 	template<typename T, typename... Args> LexicalAnalyzer(T& head, Args&... rest) {
 		unit_list.push_back(head);
 		add_token(rest...);
