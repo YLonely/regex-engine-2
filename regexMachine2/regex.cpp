@@ -227,11 +227,13 @@ std::vector<group_index> CharSet::get_group_index(std::vector<char_group> edges)
 group_index CharSet::get_group_index(wchar_t &ch)
 {
 	group_index index = e_set.size();
+	char_group temp;
 	if (e_set.empty())
 		return index;
 	for (group_index i = 0; i < e_set.size(); ++i)
 	{
-		if (ch >= e_set[i].first&&ch <= e_set[i].second)
+		temp = e_set[i];
+		if (ch >= temp.first&&ch <= temp.second)
 		{
 			index = i;
 			break;

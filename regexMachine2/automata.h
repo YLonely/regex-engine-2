@@ -45,9 +45,6 @@ public:
 	static void reset() {
 		index_count = 0;
 	}
-	/*~NFAStatus() {
-		std::cout << "Status:shit" << std::endl;
-	}*/
 private:
 	std::vector<edge_ptr> in_edges;
 	std::vector<edge_ptr> out_edges;
@@ -74,9 +71,6 @@ public:
 	auto get_end() {
 		return end;
 	}
-	/*~Edge() {
-		std::cout << "Edge:shit" << std::endl;
-	}*/
 private:
 	std::vector<group_index> match_content;
 	status_ptr start;

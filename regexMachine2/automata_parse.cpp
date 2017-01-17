@@ -300,7 +300,6 @@ list<DFAStatus> nfa_to_dfa(Automata &nfa, CharSet &char_set)
 				itt = temp2.find(nfa.get_final_index());
 				if (itt != temp2.end())
 					final = true;
-				//it->set_tran(i, add(temp2, final));
 				(*it)[i] = add(temp2, final);
 				final = false;
 			}

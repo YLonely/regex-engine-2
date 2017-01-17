@@ -5,6 +5,10 @@
 namespace regex_engine2_analyzer {
 using std::vector;
 using regex_engine2_automata::dfa_index;
+#define BUFF_SIZE 5000
+
+
+
 
 token LexicalAnalyzer::get_next_token()
 {
@@ -14,40 +18,33 @@ token LexicalAnalyzer::get_next_token()
 		int unit_id;
 	};
 	auto &list = unit_list;
-	auto advance = [&list](vector<record> &records, wchar_t &ch)->vector<record> {
-		vector<record> next_records;
-		dfa_index next;
-		for (int i = 0; i < records.size(); ++i) {
-			record &r = records[i];
+	auto advance = [&list](vector<record> *&records, wchar_t &ch, vector<record> *&next_records) {
+		next_records->clear();
+		//dfa_index next;
+		for (int i = 0; i < records->size(); ++i) {
+			record &r = (*records)[i];
 			dfa_index &current = r.status;
 			if (current == -1)
 				continue;
 			Regex &re = list[r.unit_id].regex;
-			next = re.tran[current][re.set.get_group_index(ch)];
+			dfa_index &next = re.tran[current][re.set.get_group_index(ch)];
 			if (next == -1)
 				continue;
-			next_records.push_back({ next,r.unit_id });
+			next_records->push_back({ next,r.unit_id });
 		}
-		return next_records;
 	};
 
-	/*auto is_end = [](vector<int> &statuses)->bool {
-		for (auto i : statuses)
-			if (i != -1)
-				return false;
-		return true;
-	};*/
 
-	vector<record> current_records;
+	vector<record> *current_records = new vector<record>();
 	for (auto i = 0; i < list.size(); ++i)
-		current_records.push_back({ 0,i });
+		current_records->push_back({ 0,i });
 	std::wstring lexeme;
-	vector<record> next_records;
+	vector<record> *next_records = new vector<record>();
 	record current_re;
 	dfa_index current_status;
 	if (!delay)
 	{
-		while (in_stream >> in_char)
+		while (in_char = get_next_ch())
 		{
 			if (in_char == L' ' || in_char == L'\n' || in_char == L'\t')
 				continue;
@@ -55,25 +52,27 @@ token LexicalAnalyzer::get_next_token()
 		}
 	} else
 		delay = false;
-	if (in_stream.eof())
+	if (!in_char)
 		goto match_failed;
 	do
 	{
 		if (in_char == L' ' || in_char == L'\n' || in_char == L'\t')
 			break;
-		next_records = std::move(advance(current_records, in_char));
-		if (next_records.empty())
+		advance(current_records, in_char, next_records);
+		if (next_records->empty())
 		{
 			//in_stream.seekg(-1, std::ios::cur);
 			delay = true;
 			break;
 		}
 		lexeme += in_char;
-		current_records = std::move(next_records);
+		auto temp = current_records;
+		current_records = next_records;
+		next_records = temp;
 		//auto old_seek = std::ios::cur;
-	} while (in_stream >> in_char);
+	} while (in_char = get_next_ch());
 
-	current_re = current_records[0];
+	current_re = (*current_records)[0];
 	current_status = current_re.status;
 	if (current_status != -1 && unit_list[current_re.unit_id].regex.tran[current_status].is_final())
 		return std::make_pair(unit_list[current_re.unit_id].token_name, lexeme);
@@ -82,6 +81,41 @@ token LexicalAnalyzer::get_next_token()
 
 match_failed:
 	return std::pair<std::wstring, std::wstring>();
+}
+
+
+wchar_t & LexicalAnalyzer::get_next_ch()
+{
+	int count;
+	if (!current_buff)
+	{
+		current_buff = (wchar_t *)malloc(sizeof(wchar_t)*BUFF_SIZE);
+		count = fread(current_buff, sizeof(wchar_t), BUFF_SIZE, pfile);
+		//count = in_stream.gcount();
+		if (count < BUFF_SIZE)
+			current_buff[count] = 0;
+		else
+		{
+			next_buff = (wchar_t *)malloc(sizeof(wchar_t)*BUFF_SIZE);
+			count = fread(next_buff, sizeof(wchar_t), BUFF_SIZE, pfile);
+			//count = in_stream.gcount();
+			if (count < BUFF_SIZE)
+				next_buff[count] = 0;
+		}
+	}
+	if (buff_index >= BUFF_SIZE)
+	{
+		auto temp = current_buff;
+		current_buff = next_buff;
+		next_buff = temp;
+		buff_index -= BUFF_SIZE;
+		count = fread(next_buff, sizeof(wchar_t), BUFF_SIZE, pfile);
+		//count = in_stream.gcount();
+		if (count < BUFF_SIZE)
+			next_buff[count] = 0;
+	}
+	return current_buff[buff_index++];
+
 }
 }
 

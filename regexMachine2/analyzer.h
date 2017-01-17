@@ -2,7 +2,9 @@
 #include "regex.h"
 #include "regex_exception.h"
 #include <vector>
-#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
 namespace regex_engine2_analyzer {
 using regex_engine2_regex::Regex;
 using regex_engine2_exception::regex_runtime_error;
@@ -27,7 +29,6 @@ private:
 	Regex regex;
 	int unit_id = -1;
 };
-
 
 class LexicalAnalyzer
 {
@@ -54,23 +55,31 @@ public:
 	//are empty
 	token get_next_token();
 	inline void set_target_file(std::wstring file_path) {
-		if (in_stream)
-			in_stream.close();
-		in_stream.open(file_path);
-		if (!in_stream)
+		if (pfile)
+			fclose(pfile);
+		pfile = _wfopen(file_path.data(), L"rb");
+		if (!pfile)
 			throw regex_runtime_error(L"Open file failed.");
-		in_stream.imbue(std::locale("chs"));
-		in_stream >> std::noskipws;
+		fseek(pfile, 2, SEEK_SET);
+		buff_index = 0;
 	}
 	~LexicalAnalyzer() {
-		if (in_stream)
-			in_stream.close();
+		if (pfile)
+			fclose(pfile);
+		if (current_buff)
+			free(current_buff);
+		if (next_buff)
+			free(next_buff);
 	}
 private:
+	wchar_t &get_next_ch();
 	std::vector<MatchUnit> unit_list;
-	std::wifstream in_stream;
+	FILE *pfile = NULL;
 	bool delay = false;
 	wchar_t in_char;
+	wchar_t *current_buff = NULL;
+	wchar_t *next_buff = NULL;
+	unsigned int buff_index = 0;
 };
 
 
