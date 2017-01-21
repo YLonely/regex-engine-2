@@ -186,8 +186,8 @@ void set_item(shared_ptr<SetNode> &set)
 		} else if (!setchar)
 		{
 			set->add_set_range(c1);
-			setchar = false;
 		}
+		setchar = false;
 	}
 }
 
@@ -216,37 +216,36 @@ void functional_char(node_ptr &node)
 	{
 	case 't':
 		node = make_shared<CharNode>('\t');
-		break;
+		return;
 	case 'n':
 		node = make_shared<CharNode>('\n');
-		break;
+		return;
 	case 'r':
 		node = make_shared<CharNode>('\r');
-		break;
+		return;
 	case 'f':
 		node = make_shared<CharNode>('\f');
-		break;
+		return;
 	case 'd':
 	case 'D':
 		set = ch == 'd' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
 		set->add_set_range(L'0', L'9');
-		node = set;
 		break;
 	case 's':
 	case 'S':
 		set = ch == 's' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
 		set->add_set_range(L'\t').add_set_range(L'\n').add_set_range(L'\r').add_set_range(L'\f');
-		node = set;
 		break;
 	case 'w':
 	case 'W':
 		set = ch == 'w' ? make_shared<SetNode>(true) : make_shared<SetNode>(false);
 		set->add_set_range(L'a', L'z').add_set_range(L'A', L'Z').add_set_range(L'0', L'9').add_set_range(L'_');
-		node = set;
 		break;
 	default:
 		break;
 	}
+	set->merge();
+	node = set;
 }
 
 

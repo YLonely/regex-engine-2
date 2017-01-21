@@ -327,7 +327,7 @@ tuple<CharSet, Dtran> automata_parse(wstring restring)
 	auto c_set = std::move(e_visitor.get_set());
 	Automata nfa = nodes_to_nfa(ast, c_set);
 	auto dtran = nfa_to_dfa(nfa, c_set);
-	nfa.free();
+	//nfa.free();
 	auto mini_dtran = dfa_minimize(dtran);
 
 	return std::make_tuple(c_set, mini_dtran);
