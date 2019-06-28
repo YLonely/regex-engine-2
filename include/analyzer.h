@@ -1,6 +1,9 @@
 #pragma once
+#include <codecvt>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 #include <vector>
 #include "regex.h"
 #include "regex_exception.h"
@@ -58,32 +61,22 @@ class LexicalAnalyzer {
     // wrong with the function,the two part of the pair are empty
     token get_next_token();
     inline void set_target_file(std::string file_path) {
-        if (pfile)
-            fclose(pfile);
-        pfile = fopen(file_path.data(), "r,ccs=UTF-8");
-        if (!pfile)
+        std::wifstream wif(file_path);
+        if (!wif.is_open())
             throw regex_runtime_error(L"Open file failed.");
-        //fseek(pfile, 2, SEEK_SET);
-        buff_index = 0;
-    }
-    ~LexicalAnalyzer() {
-        if (pfile)
-            fclose(pfile);
-        if (current_buff)
-            free(current_buff);
-        if (next_buff)
-            free(next_buff);
+        wif.imbue(std::locale("zh_CN.UTF-8"));
+        std::wstringstream wss;
+        wss << wif.rdbuf();
+        this->content = wss.str();
     }
 
    private:
     wchar_t& get_next_ch();
     std::vector<MatchUnit> unit_list;
-    FILE* pfile = NULL;
     bool delay = false;
     wchar_t in_char;
-    char* current_buff = NULL;
-    char* next_buff = NULL;
     unsigned int buff_index = 0;
+    std::wstring content;
 };
 
 }  // namespace lw_regex

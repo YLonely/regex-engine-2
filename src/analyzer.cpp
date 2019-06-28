@@ -1,6 +1,4 @@
 #include "analyzer.h"
-#include <codecvt>
-#include <locale>
 #include "automata.h"
 
 namespace lw_regex {
@@ -76,35 +74,8 @@ match_failed:
 }
 
 wchar_t& LexicalAnalyzer::get_next_ch() {
-    int count;
-    if (!current_buff) {
-        current_buff = (char*)malloc(sizeof(char) * BUFF_SIZE);
-        count = fread(current_buff, sizeof(char), BUFF_SIZE, pfile);
-        // count = in_stream.gcount();
-        if (count < BUFF_SIZE)
-            current_buff[count] = 0;
-        else {
-            next_buff = (char*)malloc(sizeof(char) * BUFF_SIZE);
-            count = fread(next_buff, sizeof(char), BUFF_SIZE, pfile);
-            // count = in_stream.gcount();
-            if (count < BUFF_SIZE)
-                next_buff[count] = 0;
-        }
-        std::string temp = current_buff;
-        std::wstring_convert<std::codecvt_utf8<wchar_t>> wcv;
-        auto new_buff = wcv.from_bytes(temp);
-    }
-    if (buff_index >= BUFF_SIZE) {
-        auto temp = current_buff;
-        current_buff = next_buff;
-        next_buff = temp;
-        buff_index -= BUFF_SIZE;
-        count = fread(next_buff, sizeof(char), BUFF_SIZE, pfile);
-        // count = in_stream.gcount();
-        if (count < BUFF_SIZE)
-            next_buff[count] = 0;
-    }
-    return current_buff[buff_index++];
+    auto res = this->content[this->buff_index++];
+    return res;
 }
 #undef BUFF_SIZE
 }  // namespace lw_regex
