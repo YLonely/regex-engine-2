@@ -49,6 +49,10 @@ class Regex {
     void set_regex(std::wstring re);
 
     bool match(std::wstring teststring, MATCH_TYPE);
+
+    /*
+        Return a list of match result, the first part of pair indicates the begin index of matched substring, the second part is the matched string.
+     */
     inline std::vector<std::pair<unsigned int, std::wstring>>& get_result() {
         return result;
     }

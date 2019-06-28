@@ -42,6 +42,12 @@ void Regex::set_regex(wstring re) {
     }
 }
 
+/*  
+    Retures wether the teststring matches the Regex.
+    There are two types of MATCH_TYPE:
+        - MATCH_TYPE::ALL_MATCH  return true if and only if the whole teststring matches the regex.
+        - MATCH_TYPE::SUB_MATCH  return true if part of the teststring matches the regex.
+*/
 bool Regex::match(wstring teststring, MATCH_TYPE type) {
     int matched_pos;
     if (type == ALL_MATCH) {

@@ -1,6 +1,16 @@
-#include "analyzer.h"
-#include "regex.h"
-#include "std.h"
+# Regex Engine2
+My personal toy C++ regex engine based on formal automata parsing techs.
+
+# Install 
+Just copy all the files in `src` and `include` into your project and you are ready to go.
+
+# Example
+Here's an simple example to show you how to use the library.
+
+```C++
+#include "analyzer.h"       // LexicalAnalyzer header file
+#include "regex.h"          // Regex header file
+#include "std.h"            // Some std header file <iostream> <cstdlib> ....
 
 using namespace lw_regex;
 
@@ -19,6 +29,7 @@ int main() {
         an.set_target_file("./test.txt");
         token temp = an.get_next_token();
         while (!(temp.first == L"" && temp.second == L"")) {
+            // output token's name and the lexeme
             std::wcout << temp.first + L"  " + temp.second << std::endl;
             temp = an.get_next_token();
         }
@@ -28,3 +39,5 @@ int main() {
     getchar();
     return 0;
 }
+```
+`make` will build this example.

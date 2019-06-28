@@ -10,7 +10,7 @@ wstring info_handler(const wstring pre_detail,
                      const wstring::size_type& pos) {
     wstring tmp = pre_detail + detail + L";";
     wstring regex_string = L"Regex:" + regex;
-    wstring pos_string = L"";
+    wstring pos_string = L"      ";
     for (wstring::size_type i = 0; i <= pos; i++) {
         if (i == pos)
             pos_string += L"^";

@@ -56,10 +56,13 @@ class LexicalAnalyzer {
         unit_list.push_back(head);
         add_token(rest...);
     }
-    // This function return a pair,the first part of the pair is token's
-    // name,and the second part is lexeme.when the match finish or somethine
-    // wrong with the function,the two part of the pair are empty
+    // This function return a pair, the first part of the pair is token's
+    // name,and the second part is lexeme. when the match finish or somethine
+    // wrong with the function, pair will be empty.
     token get_next_token();
+    /*
+        Set the file to be analysed
+     */
     inline void set_target_file(std::string file_path) {
         std::wifstream wif(file_path);
         if (!wif.is_open())
