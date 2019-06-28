@@ -1,6 +1,8 @@
 # Regex Engine2
 My personal toy C++ regex engine based on formal automata parsing techs.
 
+Please visit [blog](http://ylonely.github.io/2017/01/20/regex-engine1/) for more details.
+
 # Install 
 Just copy all the files in `src` and `include` into your project and you are ready to go.
 
